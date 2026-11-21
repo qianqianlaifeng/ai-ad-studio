@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI 广告创作台 · 一键生成 155 广告</title>
+<title>广告设计生成 · 一键生成 155 广告</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">✦</div>
-      <div><div class="brand-name">AI 创作台</div><div class="brand-sub">AD STUDIO</div></div>
+      <div><div class="brand-name">广告设计生成</div><div class="brand-sub">AD DESIGN STUDIO</div></div>
     </div>
 
     <nav class="nav">
@@ -26,10 +26,11 @@
       <button class="nav-item" data-jump="mod9"><span class="nav-ico">▶</span>视频生成 <span class="caret">▾</span></button>
       <button class="nav-item sub" data-jump="mod9"><span class="nav-ico">▫</span>视频生视频</button>
       <button class="nav-item accent" data-jump="top"><span class="nav-ico">✦</span>一键生成 155 广告</button>
+      <button class="nav-item accent nav-30s" data-jump="top"><span class="nav-ico">⚡</span>一键生成 30S 广告</button>
 
       <div class="nav-group-title">记录</div>
-      <button class="nav-item" data-jump="mod6"><span class="nav-ico">▤</span>追画区域</button>
-      <button class="nav-item" data-jump="mod10"><span class="nav-ico">▣</span>视频历史</button>
+      <button class="nav-item" data-jump="mod6"><span class="nav-ico">▤</span>追画区域<span class="badge" id="navImageCount">0</span></button>
+      <button class="nav-item" data-jump="mod10"><span class="nav-ico">▣</span>视频历史<span class="badge" id="navVideoCount">0</span></button>
     </nav>
 
     <div class="sidebar-foot">
@@ -230,6 +231,7 @@
 <div id="toastBox" class="toast-box"></div>
 
 <script src="api.js"></script>
+<script src="ad-skills.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

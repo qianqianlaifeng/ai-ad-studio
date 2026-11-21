@@ -36,6 +36,8 @@
   }
 
   var IMAGE_STRATEGY =
+    '【内置广告技能库已启用】剧情广告 / 品牌大片 / 达人带货 · 20 个有来源编号的正式小类\n' +
+    '硬规则：一条广告只讲 1 个主卖点；前 1 秒出现商品/结果/冲突；台词按 4.5 字每秒配时长；A-roll 无背景音乐纯人声，B-roll 无背景音乐纯画面素材。\n' +
     '核心逻辑：叙事与重构 (Narrative & Texture)\n' +
     '广告技能遵循以下 9 个 step：\n' +
     '1.「开场钩子」Establishing Shot：必须包含大场景（海边日落 / 城市夜景等），先建立情绪。\n' +
@@ -49,10 +51,13 @@
     '9.「可剪辑性」：每个镜头独立成帧，便于后续图生视频。';
 
   var VIDEO_STRATEGY =
-    'Role: 你是高端电商广告导演，负责把分镜图转化为连贯、可信的产品广告片。\n' +
-    'Task: 依据九宫格分镜，输出一段 15 秒左右视频：镜头从大场景缓缓推进 → 产品出场 → 材质微距 → 英雄定格。\n' +
-    'Audio stream prompt: 轻柔钢琴与弦乐铺底，海浪白噪音，产品落桌的细微触感音，结尾一声干净的品牌音效。\n' +
-    'Constraints: 不新增画面文字；产品外形、颜色、材质与参考图完全一致；镜头运动平滑，无突变、无变形。';
+    '【内置带货视频技能：chuanzhang + 广告skill】\n' +
+    '主播方案：按品类选人设，主播三视图（正面/侧面/背面同一人同一妆造）作为一致性锚点。\n' +
+    '分镜五类：痛点画面 / 使用画面 / 推荐画面 / 效果画面 / 产品空镜（至少 1 条，首帧锚定商品图）。\n' +
+    'A-roll：2-3 段口播，逐段换景别（中景→近景→手持推荐），开场即开口，末尾「无背景音乐，纯人声」。\n' +
+    'B-roll：3-4 条，用分镜图做首帧，只写画面怎么动，末尾「无背景音乐，纯画面素材」。\n' +
+    '口播时长：4.5 字/秒（5s≈22 字、4s≈18 字、3s≈13 字），时长不足就压缩台词。\n' +
+    '质检：喷头外露再按压、开盖再挤出；产品相对大小真实；无多余手指/多手；无变形文字。';
 
   var S = {
     cfg: AIHub.loadConfig(),
@@ -82,27 +87,45 @@
   }
   function buildImagePromptLocal() {
     var p = product();
+    var sk = window.AdSkills;
+    var group = sk.inferGroup(p.style + p.scene, p.sell);
+    var sub = sk.pickSubtype(group, p.name + p.sell, p.style + p.scene);
+    var host = sk.detectHost(p.name + p.sell);
     return [
-      '【产品】' + p.name,
-      '【核心卖点】' + p.sell,
-      '【画面风格】' + p.style,
-      '【使用场景】' + p.scene,
-      '【主色】' + p.color,
+      '【产品档案】产品名：' + p.name + ' / 核心卖点：' + p.sell + ' / 主色：' + p.color,
+      '【生产大类】' + group + '  【正式小类】' + sub.name + '（' + sub.id + '，来源仅内部使用）',
+      '【主播方案】' + host.host.role + '，' + host.host.age + '岁，' + host.host.scene + '，' + host.host.look + '，' + host.host.mood,
+      '【五类分镜】' + sk.FIVE_SHOTS.map(function (s, i) { return (i + 1) + '. ' + s.key + '：' + s.desc; }).join('\n'),
+      '【小类分镜节奏】' + sub.beats.map(function (b, i) { return '  ' + i + '）' + b; }).join('\n'),
+      '【画面风格】' + p.style + ' / 使用场景：' + p.scene,
       '【核心逻辑：叙事与重构 (Narrative & Texture)】',
       IMAGE_STRATEGY,
-      '【输出要求】按 9 个 step 依次描述每镜的画面、机位、光线、主体位置与材质细节；每镜独立成帧；整体色调统一；不生成任何画面文字。'
+      '【输出要求】按小类分镜节奏逐镜描述画面、机位、光线、主体位置、产品真实相对大小与材质细节；商品外观全片一致；每镜独立成帧；竖屏 9:16；不生成任何画面文字。'
     ].join('\n');
   }
   function buildVideoPromptLocal() {
     var p = product();
-    var ip = $('#imagePrompt').value.trim().slice(0, 900);
+    var sk = window.AdSkills;
+    var ip = $('#imagePrompt').value.trim().slice(0, 700);
+    var group = sk.inferGroup(p.style + p.scene, p.sell);
+    var sub = sk.pickSubtype(group, p.name + p.sell, p.style + p.scene);
+    var host = sk.detectHost(p.name + p.sell);
     return [
-      'Role: 你是高端电商广告导演，负责把分镜图转化为连贯、可信的产品广告片。',
-      'Task: 为「' + p.name + '」生成一段 ' + p.duration + ' 秒竖/横屏广告视频。卖点：' + p.sell + '。场景：' + p.scene + '。',
+      'Role: 高端电商广告导演（内置技能：广告skill + chuanzhang）。生产大类：' + group + '，正式小类：' + sub.name + '（' + sub.id + '）。',
+      'Task: 为「' + p.name + '」生成一段 ' + p.duration + ' 秒广告视频。卖点：' + p.sell + '。场景：' + p.scene + '。',
+      '商品图｜所有分镜图中产品外观以此为准，必须保持颜色、形状、材质、包装、配件与真实相对大小一致。',
+      '主播锚点：' + host.host.role + '，' + host.host.scene + '，' + host.host.look + '；三视图锁定人物形象，全片不变。',
       '分镜依据（摘要）：' + ip,
-      '镜头调度：01 大场景建立 → 02 缓缓推近产品 → 03 材质微距 → 04 英雄定格；镜头运动平滑，产品外形、颜色、材质与参考图完全一致。',
-      'Audio stream prompt: 轻柔钢琴与弦乐铺底，环境白噪音，产品触感音，结尾干净的品牌音效。',
-      'Constraints: 不新增画面文字；无镜头突变、无主体变形；符合' + p.style + '。'
+      'A-roll 口播（2-3 段，每段换景别，4.5 字/秒，末尾「无背景音乐，纯人声」）：',
+      '  1. 中景·痛点开场：如果你也有' + p.sell.split(/[,，]/)[0] + '的困扰，先看这个。（开场即开口）',
+      '  2. 近景·卖点证明：' + p.name + '，' + p.sell + '，这里直接展示给你。',
+      '  3. 手持推荐：适合日常使用，喜欢可以看看这一款，' + p.name + '真的不错。',
+      'B-roll 辅助镜头（3-4 条，用分镜图做首帧，末尾「无背景音乐，纯画面素材」）：',
+      '  1. 首帧：痛点分镜图。画面：人物表情克制，镜头缓慢推近，画外音垫入 A-roll 第 1 段。',
+      '  2. 首帧：使用分镜图。画面：手部真实使用动作，镜头缓慢推近细节；按压类须瓶盖已取下、喷头外露。',
+      '  3. 首帧：产品空镜分镜图。画面：' + p.name + '静置' + p.scene + '，镜头缓慢环绕，光线流转，无主播出镜。',
+      '  4. 首帧：效果分镜图。画面：材质/结果特写，焦点从背景过渡到产品表面。',
+      'Constraints: 不新增画面文字；无镜头突变、无主体变形；' + sk.HARD_RULES.slice(3, 9).join('；') + '。'
     ].join('\n');
   }
   function syncPromptCounts() {
@@ -288,6 +311,8 @@
   function renderHistory() {
     $('#imageHistory').innerHTML = S.images.length ? S.images.map(function (i) { return historyItem('image', i); }).join('') : '<div class="empty">暂无生成记录，点击「开始生成」后图片会出现在这里</div>';
     $('#videoHistory').innerHTML = S.videos.length ? S.videos.map(function (i) { return historyItem('video', i); }).join('') : '<div class="empty">暂无视频记录</div>';
+    $('#navImageCount').textContent = S.images.length;
+    $('#navVideoCount').textContent = S.videos.length;
   }
   function addHistory(kind, item) {
     var arr = kind === 'image' ? S.images : S.videos;
@@ -335,7 +360,7 @@
     setBusy('prompt', true);
     var task = textConfigured()
       ? AIHub.callText({
-        system: '你是顶级电商广告创意总监。按「叙事与重构 Narrative & Texture」的 9 个 step 输出可直接用于图像生成的详细中文提示词：每镜写明机位、光线、主体、材质细节与色调；整体统一；不生成画面文字。只输出提示词正文。',
+        system: (window.AdSkills && window.AdSkills.SYSTEM_PROMPT) || '你是顶级电商广告创意总监。按内置广告技能库输出可直接用于图像生成的详细中文提示词。只输出提示词正文。',
         prompt: JSON.stringify(product(), null, 2)
       })
       : Promise.resolve(buildImagePromptLocal());
@@ -356,7 +381,7 @@
     setBusy('videoPrompt', true);
     var task = textConfigured()
       ? AIHub.callText({
-        system: '你是高端电商广告导演。基于给定分镜提示词输出视频生成提示词，必须包含 Role / Task / Audio stream prompt / Constraints 四段，语言中文，镜头调度具体可执行。',
+        system: (window.AdSkills && window.AdSkills.VIDEO_SYSTEM_PROMPT) || '你是高端电商广告导演。基于给定分镜提示词输出 A-roll / B-roll 视频生成提示词，语言中文。',
         prompt: '产品信息：' + JSON.stringify(product()) + '\n\n分镜提示词：\n' + $('#imagePrompt').value.slice(0, 4000)
       })
       : Promise.resolve(buildVideoPromptLocal());
@@ -576,7 +601,11 @@
         var t = b.dataset.jump;
         if (t === 'settings') { openSettings(); return; }
         var el = document.getElementById(t);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+          setTimeout(function () { el.classList.remove('flash'); }, 1200);
+        }
       });
     });
     $('#btnSettings').addEventListener('click', function () { openSettings(); });
