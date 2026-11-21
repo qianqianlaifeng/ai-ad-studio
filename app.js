@@ -222,6 +222,7 @@
       })
       .catch(function (e) {
         setStatus('#statusGrid', '失败', 'err');
+        $('#gridHint').textContent = '生成失败：' + e.message;
         toast('分镜宫格图生成失败：' + e.message, 'err');
         S.busy.grid = false; $('#btnGenGrid').disabled = false;
         return null;
