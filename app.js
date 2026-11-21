@@ -143,9 +143,9 @@
     '产品空镜': function (p) { return '产品为主体、人物不入画，' + p.name + '静置于' + p.scene + '，低角度特写，金色夕照扫过材质表面，氛围干净高级'; },
     '痛点': function (p) { return '人物轻微疲惫的中景，痛点道具入画，表情克制不夸张，冷调前景与暖调背景形成对比'; },
     '使用': function (p) { return '真实使用动作近景，手部与' + p.name + '的真实相对大小准确，动作符合产品物理结构，浅景深'; },
-    '质感细节': function (p) { return p.name + '材质微距特写，' + p.sell.split(/[,，]/)[0] + '的纹理清晰可见，侧逆光勾边，绒面/表面细节锐利'; },
+    '质感细节': function (p) { return p.name + '材质微距特写，' + (p.sell.split(/[,，]/).filter(Boolean)[0] || p.sell) + '的纹理清晰可见，侧逆光勾边，绒面/表面细节锐利'; },
     '推荐': function (p) { return '达人手持' + p.name + '对镜头温暖微笑，半身构图，像真实种草不像广告，产品约占画面三分之一'; },
-    '效果': function (p) { return '使用结果与细节特写，展示' + p.sell.split(/[,，]/)[1] + '的可见证据，光线柔和，不夸张对比'; },
+    '效果': function (p) { var s = p.sell.split(/[,，]/).filter(Boolean); return '使用结果与细节特写，展示' + (s[1] || s[0] || p.sell) + '的可见证据，光线柔和，不夸张对比'; },
     '场景全景': function (p) { return '广角全景，' + p.scene + '完整呈现，' + p.name + '作为画面主视觉落在视觉中心，人物退为远景剪影'; },
     '手持产品': function (p) { return '人物双手捧起折叠好的' + p.name + '，半身平视，产品纹理与包边清晰，背景虚化'; },
     '产品英雄': function (p) { return p.name + '叠放于画面正中央的产品英雄镜头，正面平视，背景虚化日落，光线从右后方打入，轮廓光清晰'; }
