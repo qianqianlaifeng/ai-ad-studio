@@ -23,14 +23,15 @@
       <button class="nav-item" data-jump="mod5"><span class="nav-ico">▧</span>图像生成 <span class="caret">▾</span></button>
       <button class="nav-item sub" data-jump="mod5"><span class="nav-ico">▫</span>生图</button>
       <button class="nav-item sub" data-jump="mod1"><span class="nav-ico">▫</span>电商详情图</button>
-      <button class="nav-item" data-jump="mod9"><span class="nav-ico">▶</span>视频生成 <span class="caret">▾</span></button>
-      <button class="nav-item sub" data-jump="mod9"><span class="nav-ico">▫</span>视频生视频</button>
+      <button class="nav-item" data-jump="mod6"><span class="nav-ico">▦</span>分镜宫格图</button>
+      <button class="nav-item" data-jump="mod10"><span class="nav-ico">▶</span>视频生成 <span class="caret">▾</span></button>
+      <button class="nav-item sub" data-jump="mod10"><span class="nav-ico">▫</span>视频生视频</button>
       <button class="nav-item accent" data-jump="top"><span class="nav-ico">✦</span>一键生成 155 广告</button>
       <button class="nav-item accent nav-30s" data-jump="top"><span class="nav-ico">⚡</span>一键生成 30S 广告</button>
 
       <div class="nav-group-title">记录</div>
-      <button class="nav-item" data-jump="mod6"><span class="nav-ico">▤</span>追画区域<span class="badge" id="navImageCount">0</span></button>
-      <button class="nav-item" data-jump="mod10"><span class="nav-ico">▣</span>视频历史<span class="badge" id="navVideoCount">0</span></button>
+      <button class="nav-item" data-jump="mod7"><span class="nav-ico">▤</span>追画区域<span class="badge" id="navImageCount">0</span></button>
+      <button class="nav-item" data-jump="mod11"><span class="nav-ico">▣</span>视频历史<span class="badge" id="navVideoCount">0</span></button>
     </nav>
 
     <div class="sidebar-foot">
@@ -145,37 +146,65 @@
 
           <!-- 6 -->
           <section class="card module" id="mod6">
-            <div class="module-head"><span class="num">6</span><h2>追画区域</h2><button class="mini-btn" id="btnClearImages">清空</button></div>
+            <div class="module-head"><span class="num">6</span><h2>分镜宫格图</h2><span class="status" id="statusGrid">就绪</span></div>
+            <div class="module-body">
+              <div class="sub-title">宫格规格</div>
+              <div class="chip-row" id="gridCountRow">
+                <button class="chip" data-count="4" data-cols="2" data-ratio="1:1">2×2 四格</button>
+                <button class="chip" data-count="6" data-cols="3" data-ratio="4:5">3×2 六格</button>
+                <button class="chip active" data-count="9" data-cols="3" data-ratio="9:16">3×3 九格</button>
+              </div>
+              <div class="hint">按内置五类分镜（痛点 / 使用 / 推荐 / 效果 / 产品空镜）自动排格。画面内不写任何文字，镜号与镜头名由页面叠加，避免 AI 写字乱码。</div>
+              <button class="btn btn-primary full" id="btnGenGrid">▦ 生成分镜宫格图</button>
+              <div class="grid-preview" id="gridPreview" hidden>
+                <img id="gridImg" alt="分镜宫格图">
+                <div class="grid-overlay" id="gridOverlay"></div>
+              </div>
+              <div class="row-2" id="gridActions" hidden>
+                <button class="mini-btn" id="btnGridRef">设为视频参考图</button>
+                <button class="mini-btn" id="btnGridFull">全屏查看</button>
+              </div>
+              <div class="hint" id="gridHint">生成后点「设为视频参考图」，视频生成会自动切到 reference 模式。</div>
+            </div>
+          </section>
+
+          <!-- 7 -->
+          <section class="card module" id="mod7">
+            <div class="module-head"><span class="num">7</span><h2>追画区域</h2><button class="mini-btn" id="btnClearImages">清空</button></div>
             <div class="module-body"><div class="history-list" id="imageHistory"></div></div>
           </section>
         </div>
 
         <div class="column">
-          <!-- 7 -->
-          <section class="card module" id="mod7">
-            <div class="module-head"><span class="num">7</span><h2>大语言模型生成视频提示词</h2><span class="status" id="statusVideoPrompt">就绪</span></div>
+          <!-- 8 -->
+          <section class="card module" id="mod8">
+            <div class="module-head"><span class="num">8</span><h2>大语言模型生成视频提示词</h2><span class="status" id="statusVideoPrompt">就绪</span></div>
             <div class="module-body">
               <div class="strategy" id="videoStrategyPreview"></div>
               <button class="btn btn-pink full" id="btnGenVideoPrompt">✦ 生成视频提示词</button>
             </div>
           </section>
 
-          <!-- 8 -->
-          <section class="card module" id="mod8">
-            <div class="module-head"><span class="num">8</span><h2>大语言模型输出视频提示词</h2><button class="mini-btn" id="btnCopyVideoPrompt">复制</button></div>
+          <!-- 9 -->
+          <section class="card module" id="mod9">
+            <div class="module-head"><span class="num">9</span><h2>大语言模型输出视频提示词</h2><button class="mini-btn" id="btnCopyVideoPrompt">复制</button></div>
             <div class="module-body">
               <textarea id="videoPrompt" class="prompt-area" rows="7" spellcheck="false" placeholder="生成的视频提示词会显示在这里（可手动编辑）"></textarea>
               <div class="meta-line"><span id="videoPromptCount">0 字</span><span>可直接编辑</span></div>
             </div>
           </section>
 
-          <!-- 9 -->
-          <section class="card module" id="mod9">
-            <div class="module-head"><span class="num">9</span><h2>视频生成</h2><span class="tag" id="videoChannel">通道：未配置</span><span class="status" id="statusVideo">就绪</span></div>
+          <!-- 10 -->
+          <section class="card module" id="mod10">
+            <div class="module-head"><span class="num">10</span><h2>视频生成</h2><span class="tag" id="videoChannel">通道：未配置</span><span class="status" id="statusVideo">就绪</span></div>
             <div class="module-body">
               <div class="row-2">
-                <label class="field"><span>Enhance</span><select id="enhance"><option>有</option><option>无</option></select></label>
-                <label class="field"><span>首帧参考图</span><select id="refSource"><option value="none">不使用</option><option value="latest">使用追画区域最新图</option></select></label>
+                <label class="field"><span>参考模式</span><select id="refMode">
+                  <option value="text">纯文本生成</option>
+                  <option value="reference">参考图（宫格图 / 风格图）</option>
+                  <option value="keyframe">首帧图（单格分镜）</option>
+                </select></label>
+                <label class="field"><span>参考图来源</span><select id="refSource"><option value="none">不使用</option><option value="latest">使用追画区域最新图</option><option value="grid">使用分镜宫格图</option></select></label>
               </div>
               <div class="ref-preview" id="refPreview" hidden><img id="refImg" alt="参考图"><button class="mini-btn" id="btnClearRef">移除</button></div>
               <label class="field"><span>视频提示词</span><textarea id="videoGenPrompt" rows="4" spellcheck="false" placeholder="将模块 8 的提示词同步到这里，也可直接编辑"></textarea></label>
@@ -188,9 +217,9 @@
             </div>
           </section>
 
-          <!-- 10 -->
-          <section class="card module" id="mod10">
-            <div class="module-head"><span class="num">10</span><h2>视频生成历史</h2><button class="mini-btn" id="btnClearVideos">清空</button></div>
+          <!-- 11 -->
+          <section class="card module" id="mod11">
+            <div class="module-head"><span class="num">11</span><h2>视频生成历史</h2><button class="mini-btn" id="btnClearVideos">清空</button></div>
             <div class="module-body"><div class="history-list" id="videoHistory"></div></div>
           </section>
         </div>

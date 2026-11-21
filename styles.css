@@ -120,6 +120,16 @@ textarea.prompt-area{line-height:1.7;font-size:11.5px;min-height:120px}
 .ref-preview{display:flex;align-items:center;gap:10px;background:#0b1020;border:1px dashed var(--border2);border-radius:9px;padding:7px}
 .ref-preview img{width:84px;height:52px;object-fit:cover;border-radius:6px}
 
+/* ---------- 分镜宫格图 ---------- */
+.grid-preview{position:relative;margin:10px auto 0;width:min(100%, calc(520px * var(--ar, 0.5625)));aspect-ratio:var(--ar, 0.5625);border:1px solid var(--border2);border-radius:10px;overflow:hidden;background:#070a12;line-height:0}
+.grid-preview img{display:block;width:100%;height:100%;object-fit:cover}
+.grid-overlay{position:absolute;inset:0;display:grid;pointer-events:none}
+.grid-cell{display:flex;align-items:flex-end;gap:5px;padding:6px;min-width:0}
+.grid-cell b{font-size:11px;line-height:1;color:#fff;background:rgba(10,13,22,.82);border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:3px 5px;flex:0 0 auto}
+.grid-cell i{font-style:normal;font-size:9px;line-height:1.2;color:#fff;background:rgba(10,13,22,.66);border-radius:4px;padding:2px 4px;max-width:calc(100% - 22px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#gridActions{grid-template-columns:1fr 1fr;gap:8px}
+#gridActions .mini-btn{text-align:center;padding:7px 8px}
+
 /* ---------- 历史卡片 ---------- */
 .history-list{display:flex;flex-direction:column;gap:10px;max-height:660px;overflow-y:auto;padding-right:3px}
 .history-item{background:#0d1221;border:1px solid var(--border);border-radius:10px;padding:9px;display:flex;gap:10px}

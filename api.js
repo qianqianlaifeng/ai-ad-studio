@@ -38,6 +38,8 @@
       queryMethod: 'GET',
       headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}',
       body: '{"model":{{model}},"prompt":{{prompt}},"ratio":{{ratio}},"duration":{{duration}},"resolution":{{resolution}},"fps":{{fps}},"image":{{imageUrl}}}',
+      bodyRef: '',
+      bodyKeyframe: '',
       taskPaths: 'id,task_id,data.id,data.task_id,output.task_id,task.id',
       statusPaths: 'status,data.status,task.status,output.task_status,state',
       successValues: 'succeeded,success,completed,done,finished',
@@ -143,6 +145,9 @@
         model: 'agnes-video-2.5-flash',
         headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}',
         body: '{"model":{{model}},"prompt":{{prompt}},"mode":"text","seconds":{{duration}},"size":"720P","aspect_ratio":{{ratio}}}',
+        // 实测：reference 模式只认 images 数组（image 会被当成 first_frame 并报冲突）；keyframe 模式认 first_frame / image
+        bodyRef: '{"model":{{model}},"prompt":{{prompt}},"mode":"reference","seconds":{{duration}},"size":"720P","aspect_ratio":{{ratio}},"images":{{imagesJson}}}',
+        bodyKeyframe: '{"model":{{model}},"prompt":{{prompt}},"mode":"keyframe","seconds":{{duration}},"size":"720P","aspect_ratio":{{ratio}},"first_frame":{{imageUrl}}}',
         taskPaths: 'task_id,id,video_id',
         statusPaths: 'status',
         successValues: 'completed',
@@ -168,7 +173,14 @@
   function loadConfig() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? deepMerge(DEFAULT_CONFIG, JSON.parse(raw)) : deepMerge(DEFAULT_CONFIG, {});
+      var cfg = raw ? deepMerge(DEFAULT_CONFIG, JSON.parse(raw)) : deepMerge(DEFAULT_CONFIG, {});
+      // 兼容旧配置：预设新增的参考图模板自动补全，避免旧 localStorage 里 bodyRef 为空导致参考模式失效
+      var pv = PRESETS.video[cfg.video.preset];
+      if (pv) {
+        if (!cfg.video.bodyRef) cfg.video.bodyRef = pv.bodyRef || '';
+        if (!cfg.video.bodyKeyframe) cfg.video.bodyKeyframe = pv.bodyKeyframe || '';
+      }
+      return cfg;
     } catch (e) { return deepMerge(DEFAULT_CONFIG, {}); }
   }
   function saveConfig(cfg) { localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg)); }
@@ -361,15 +373,20 @@
 
   function callVideo(opts, onProgress) {
     var cfg = loadConfig().video;
+    var refMode = opts.refMode || 'text';
     var vars = {
       key: cfg.apiKey, model: activeModel('video', opts.model), prompt: opts.prompt || '',
       ratio: opts.ratio || '16:9', duration: Number(opts.duration) || 15,
       fps: Number(opts.fps) || 30, resolution: opts.resolution || '720p',
       videoSize: opts.videoSize || '720P', seed: Number(opts.seed) || 0,
-      imageUrl: opts.imageUrl || null, firstFrame: opts.imageUrl || null
+      imageUrl: opts.imageUrl || null, firstFrame: opts.imageUrl || null,
+      imagesJson: opts.imageUrl ? [opts.imageUrl] : [], refMode: refMode
     };
+    var bodyTpl = cfg.body;
+    if (refMode === 'reference' && cfg.bodyRef) bodyTpl = cfg.bodyRef;
+    else if (refMode === 'keyframe' && cfg.bodyKeyframe) bodyTpl = cfg.bodyKeyframe;
     var createUrl = fullUrl(cfg.baseUrl, cfg.path, vars);
-    var createBody = parseBody(cfg.body, vars);
+    var createBody = parseBody(bodyTpl, vars);
     var createHeaders = parseHeaders(cfg.headers, vars);
     function create(attempt) {
       return request(createUrl, 'POST', createHeaders, createBody, cfg.timeout).catch(function (e) {
