@@ -386,6 +386,55 @@
     refreshConfigUI();
     $('#settingsOverlay').hidden = true;
   }
+  /* ---------- 使用教程 ---------- */
+  var TUT_SEEN_KEY = 'ai_studio_tutorial_seen';
+  function setTutActive(id) {
+    $$('#tutToc button').forEach(function (b) { b.classList.toggle('active', b.dataset.tut === id); });
+  }
+  function tutGoto(section, instant) {
+    var el = document.getElementById(section);
+    if (!el) return;
+    el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block: 'start' });
+    setTutActive(section);
+  }
+  function openTutorial(section) {
+    $('#tutorialOverlay').hidden = false;
+    var c = $('#tutContent');
+    if (c) c.scrollTop = 0;
+    if (section) tutGoto(section, true); else setTutActive('tut1');
+    $('#firstTip').hidden = true;
+    try { localStorage.setItem(TUT_SEEN_KEY, '1'); } catch (e) {}
+  }
+  function closeTutorial() { $('#tutorialOverlay').hidden = true; }
+  function markTutorialSeen() {
+    $('#firstTip').hidden = true;
+    try { localStorage.setItem(TUT_SEEN_KEY, '1'); } catch (e) {}
+  }
+  function initTutorial() {
+    var seen = false;
+    try { seen = !!localStorage.getItem(TUT_SEEN_KEY); } catch (e) {}
+    $('#firstTip').hidden = seen;
+
+    $$('#tutToc button').forEach(function (b) {
+      b.addEventListener('click', function () { tutGoto(this.dataset.tut); });
+    });
+    $('#tutContent').addEventListener('scroll', function () {
+      var c = this, base = c.getBoundingClientRect().top + 40, cur = 'tut1';
+      $$('#tutContent .tut-sec').forEach(function (s) {
+        if (s.getBoundingClientRect().top <= base) cur = s.id;
+      });
+      setTutActive(cur);
+    });
+    $('#btnTutorial').addEventListener('click', function () { openTutorial(); });
+    $('#navTutorial').addEventListener('click', function () { openTutorial(); });
+    $('#btnCloseTutorial').addEventListener('click', closeTutorial);
+    $('#btnTutClose2').addEventListener('click', closeTutorial);
+    $('#btnTutStart').addEventListener('click', closeTutorial);
+    $('#tutorialOverlay').addEventListener('click', function (e) { if (e.target === this) closeTutorial(); });
+    $('#btnFirstTipOpen').addEventListener('click', function () { openTutorial(); });
+    $('#btnFirstTipClose').addEventListener('click', markTutorialSeen);
+  }
+
   function channel(kind) {
     var c = S.cfg[kind];
     if (!c.baseUrl) return '未配置';
@@ -824,6 +873,7 @@
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') {
         if (!$('#lightbox').hidden) $('#lightbox').hidden = true;
+        if (!$('#tutorialOverlay').hidden) { closeTutorial(); return; }
         if (!$('#settingsOverlay').hidden) closeSettings();
       }
     });
@@ -840,4 +890,5 @@
   refreshConfigUI();
   renderHistory();
   bind();
+  initTutorial();
 })();

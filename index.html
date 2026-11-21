@@ -15,6 +15,8 @@
     </div>
 
     <nav class="nav">
+      <button class="nav-item nav-tut" id="navTutorial"><span class="nav-ico">?</span>使用教程<span class="badge badge-new">新</span></button>
+
       <div class="nav-group-title">连接</div>
       <button class="nav-item" data-jump="settings"><span class="nav-ico">⚿</span>API Key</button>
 
@@ -49,11 +51,19 @@
       </div>
       <div class="topbar-right">
         <span class="pill" id="modelPill">未配置模型</span>
+        <button class="icon-btn icon-btn-tut" id="btnTutorial" title="使用教程">? 教程</button>
         <button class="icon-btn" id="btnSettings" title="接口与密钥设置">⚙ 设置</button>
       </div>
     </header>
 
     <main class="workspace" id="top">
+      <div class="first-tip" id="firstTip" hidden>
+        <span class="first-tip-ico">👋</span>
+        <div class="first-tip-text"><b>第一次用？</b>先花 3 分钟看教程：配接口 → 一键出片 → 宫格图出视频，一条流程走完就会了。</div>
+        <button class="btn btn-primary" id="btnFirstTipOpen">看教程</button>
+        <button class="icon-btn" id="btnFirstTipClose" title="不再提示">✕</button>
+      </div>
+
       <section class="hero card">
         <div class="hero-main">
           <div class="hero-badge">✦ 全流程工作台</div>
@@ -90,7 +100,7 @@
 
           <!-- 3 -->
           <section class="card module" id="mod3">
-            <div class="module-head"><span class="num">3</span><h2>大语言模型生成提示词</h2><span class="status" id="statusPrompt">就绪</span></div>
+            <div class="module-head"><span class="num">2</span><h2>大语言模型生成提示词</h2><span class="status" id="statusPrompt">就绪</span></div>
             <div class="module-body">
               <div class="strategy" id="strategyPreview"></div>
               <button class="btn btn-outline full" id="btnGenPrompt">◇ 生成叙事提示词</button>
@@ -100,7 +110,7 @@
 
           <!-- 4 -->
           <section class="card module" id="mod4">
-            <div class="module-head"><span class="num">4</span><h2>提示词预览</h2><button class="mini-btn" id="btnCopyImagePrompt">复制</button></div>
+            <div class="module-head"><span class="num">3</span><h2>提示词预览</h2><button class="mini-btn" id="btnCopyImagePrompt">复制</button></div>
             <div class="module-body">
               <textarea id="imagePrompt" class="prompt-area" rows="12" spellcheck="false" placeholder="这里会显示生成的完整提示词（可手动编辑）"></textarea>
               <div class="meta-line"><span id="promptCount">0 字</span><span>可直接手动修改，图像生成以此处内容为准</span></div>
@@ -111,7 +121,7 @@
         <div class="column">
           <!-- 5 -->
           <section class="card module" id="mod5">
-            <div class="module-head"><span class="num">5</span><h2>图像生成模块</h2><span class="tag" id="imageChannel">通道：未配置</span></div>
+            <div class="module-head"><span class="num">4</span><h2>图像生成模块</h2><span class="tag" id="imageChannel">通道：未配置</span></div>
             <div class="module-body">
               <div class="sub-title">模型选择</div>
               <div class="chip-row" id="imageModels">
@@ -146,7 +156,7 @@
 
           <!-- 6 -->
           <section class="card module" id="mod6">
-            <div class="module-head"><span class="num">6</span><h2>分镜宫格图</h2><span class="status" id="statusGrid">就绪</span></div>
+            <div class="module-head"><span class="num">5</span><h2>分镜宫格图</h2><span class="status" id="statusGrid">就绪</span></div>
             <div class="module-body">
               <div class="sub-title">宫格规格</div>
               <div class="chip-row" id="gridCountRow">
@@ -170,7 +180,7 @@
 
           <!-- 7 -->
           <section class="card module" id="mod7">
-            <div class="module-head"><span class="num">7</span><h2>追画区域</h2><button class="mini-btn" id="btnClearImages">清空</button></div>
+            <div class="module-head"><span class="num">6</span><h2>追画区域</h2><button class="mini-btn" id="btnClearImages">清空</button></div>
             <div class="module-body"><div class="history-list" id="imageHistory"></div></div>
           </section>
         </div>
@@ -178,7 +188,7 @@
         <div class="column">
           <!-- 8 -->
           <section class="card module" id="mod8">
-            <div class="module-head"><span class="num">8</span><h2>大语言模型生成视频提示词</h2><span class="status" id="statusVideoPrompt">就绪</span></div>
+            <div class="module-head"><span class="num">7</span><h2>大语言模型生成视频提示词</h2><span class="status" id="statusVideoPrompt">就绪</span></div>
             <div class="module-body">
               <div class="strategy" id="videoStrategyPreview"></div>
               <button class="btn btn-pink full" id="btnGenVideoPrompt">✦ 生成视频提示词</button>
@@ -187,7 +197,7 @@
 
           <!-- 9 -->
           <section class="card module" id="mod9">
-            <div class="module-head"><span class="num">9</span><h2>大语言模型输出视频提示词</h2><button class="mini-btn" id="btnCopyVideoPrompt">复制</button></div>
+            <div class="module-head"><span class="num">8</span><h2>大语言模型输出视频提示词</h2><button class="mini-btn" id="btnCopyVideoPrompt">复制</button></div>
             <div class="module-body">
               <textarea id="videoPrompt" class="prompt-area" rows="7" spellcheck="false" placeholder="生成的视频提示词会显示在这里（可手动编辑）"></textarea>
               <div class="meta-line"><span id="videoPromptCount">0 字</span><span>可直接编辑</span></div>
@@ -196,7 +206,7 @@
 
           <!-- 10 -->
           <section class="card module" id="mod10">
-            <div class="module-head"><span class="num">10</span><h2>视频生成</h2><span class="tag" id="videoChannel">通道：未配置</span><span class="status" id="statusVideo">就绪</span></div>
+            <div class="module-head"><span class="num">9</span><h2>视频生成</h2><span class="tag" id="videoChannel">通道：未配置</span><span class="status" id="statusVideo">就绪</span></div>
             <div class="module-body">
               <div class="row-2">
                 <label class="field"><span>参考模式</span><select id="refMode">
@@ -219,12 +229,152 @@
 
           <!-- 11 -->
           <section class="card module" id="mod11">
-            <div class="module-head"><span class="num">11</span><h2>视频生成历史</h2><button class="mini-btn" id="btnClearVideos">清空</button></div>
+            <div class="module-head"><span class="num">10</span><h2>视频生成历史</h2><button class="mini-btn" id="btnClearVideos">清空</button></div>
             <div class="module-body"><div class="history-list" id="videoHistory"></div></div>
           </section>
         </div>
       </div>
     </main>
+  </div>
+</div>
+
+<!-- 使用教程弹层 -->
+<div class="overlay" id="tutorialOverlay" hidden>
+  <div class="modal tutorial-modal">
+    <div class="modal-head">
+      <h2>使用教程 · 3 分钟上手</h2>
+      <button class="icon-btn" id="btnCloseTutorial">✕</button>
+    </div>
+    <div class="tutorial-body">
+      <nav class="tut-toc" id="tutToc">
+        <button class="active" data-tut="tut1">① 先配接口（必做）</button>
+        <button data-tut="tut2">② 最快出片：一键生成</button>
+        <button data-tut="tut3">③ 分步精细控制</button>
+        <button data-tut="tut4">④ 宫格图 → 出视频</button>
+        <button data-tut="tut5">⑤ 30 秒广告</button>
+        <button data-tut="tut6">⑥ 各模块速查</button>
+        <button data-tut="tut7">⑦ 常见问题</button>
+      </nav>
+      <div class="tut-content" id="tutContent">
+
+        <section class="tut-sec" id="tut1">
+          <h3><i>①</i>先配接口（第一次使用必做）</h3>
+          <p class="tut-lead">这个工作台不绑定服务商，文本、图片、视频三个模型都接你自己的接口和密钥。配置一次，之后一直有效。</p>
+          <ol class="tut-steps">
+            <li>点右上角 <b>⚙ 设置</b>（或左侧导航「API Key」）打开设置面板。</li>
+            <li>如果用的是国内 <b>Agnes AI</b>：点 <b>「一键填入国内配置」</b>，Base URL、接口路径、模型名会自动填好，你只需要粘贴自己的 API Key。</li>
+            <li>在 <b>文本模型 / 图片模型 / 视频模型</b> 三个标签页里<b>各粘贴一次 API Key</b>（三个标签页是独立的，不会互相覆盖）。</li>
+            <li>点 <b>「保存设置」</b>。右上角显示模型名、左下角圆点变绿，就说明配置成功了。</li>
+          </ol>
+          <div class="tut-warn">
+            <b>最容易错的一点：</b>三个模型名<b>必须各填各的</b>，不要互相复制。文本、图片、视频的模型名是不同的三个名字，混填会直接报「模型不存在」。
+          </div>
+          <table class="tut-table">
+            <tr><th>标签页</th><th>国内 Agnes 该填什么</th><th>作用</th></tr>
+            <tr><td>文本模型</td><td><code>agnes-3.0-flash</code></td><td>写叙事提示词、视频提示词</td></tr>
+            <tr><td>图片模型</td><td><code>agnes-image-2.5-flash</code></td><td>生成主视觉图、分镜宫格图</td></tr>
+            <tr><td>视频模型</td><td><code>agnes-video-2.5-flash</code></td><td>图生视频 / 文生视频</td></tr>
+          </table>
+          <p class="tut-note">密钥只保存在你自己浏览器的本地存储里，不会上传到任何服务器。换电脑或清缓存后需要重新填一次。</p>
+        </section>
+
+        <section class="tut-sec" id="tut2">
+          <h3><i>②</i>最快出片：一键生成全部</h3>
+          <p class="tut-lead">不想一步步点，用这个。整条流水线自动跑完。</p>
+          <ol class="tut-steps">
+            <li>在模块 <b>1 产品信息</b> 里填产品名、核心卖点、主色、场景、风格、受众（已经预置了一套示例，可以直接改）。</li>
+            <li>点页面顶部 <b>「✦ 一键生成全部」</b>。</li>
+            <li>进度条会依次显示：叙事提示词 → 主视觉图 → 视频提示词 → 视频。中途不用管。</li>
+            <li>跑完后：图片在 <b>6 追画区域</b>，视频在 <b>10 视频生成历史</b>，点缩略图可全屏预览。</li>
+          </ol>
+          <div class="tut-tip">任何一步失败，进度条和提示都会写清卡在哪一步、失败原因是什么。先按 ⑦ 常见问题 对照一下，大多数是限流或密钥问题。</div>
+        </section>
+
+        <section class="tut-sec" id="tut3">
+          <h3><i>③</i>分步精细控制（想改画面用这条）</h3>
+          <p class="tut-lead">每一步都能看到结果、手动改，适合对画面有具体要求的时候。</p>
+          <div class="tut-flow">
+            <span>1 产品信息</span><em>→</em><span>2 生成叙事提示词</span><em>→</em><span>3 提示词预览<b>（可手改）</b></span><em>→</em><span>4 图像生成</span><em>→</em><span>7 生成视频提示词</span><em>→</em><span>9 视频生成</span>
+          </div>
+          <ol class="tut-steps">
+            <li>模块 <b>2</b> 点「◇ 生成叙事提示词」，模块 <b>3</b> 会输出图片提示词。<b>这一段可以直接编辑</b>，改完再出图。</li>
+            <li>模块 <b>4</b> 选比例和数量，点「✧ 开始生成」。</li>
+            <li>模块 <b>7</b> 点「✦ 生成视频提示词」，模块 <b>8</b> 输出 A-roll 口播 + B-roll 镜头的完整提示词。</li>
+            <li>模块 <b>9</b> 选参考模式、时长，点「▶ 生成视频」。</li>
+          </ol>
+          <div class="tut-tip">模块 3 和 8 的提示词是整站的「方向盘」。想换风格、换卖点表达，改这里比改任何设置都有效。</div>
+        </section>
+
+        <section class="tut-sec" id="tut4">
+          <h3><i>④</i>分镜宫格图 → 用宫格图出视频（推荐）</h3>
+          <p class="tut-lead">这是让视频「按分镜走」的关键功能。宫格图相当于给模型一张完整的分镜脚本。</p>
+          <ol class="tut-steps">
+            <li>到模块 <b>5 分镜宫格图</b>，选规格：<b>2×2</b> 四格 / <b>3×2</b> 六格 / <b>3×3</b> 九格（默认九格，最完整）。</li>
+            <li>点 <b>「▦ 生成分镜宫格图」</b>，约 10–15 秒出图。</li>
+            <li>九格会按固定分镜顺序自动排：产品空镜 → 痛点 → 使用 → 质感细节 → 推荐 → 效果 → 场景全景 → 手持产品 → 产品英雄。每格左下角的编号和镜头名是网页叠上去的，<b>图里本身没有任何文字</b>，所以不会出现乱码。</li>
+            <li>点宫格图下方的 <b>「设为视频参考图」</b>。模块 9 会自动切成：参考模式 = <b>reference（参考图）</b>，参考图来源 = <b>分镜宫格图</b>，视频比例也会跟着宫格图走。</li>
+            <li>到模块 <b>9</b> 点 <b>「▶ 生成视频」</b>。提示词会自动追加「不要九宫格分屏、不要画格边框」，保证出的是单一连续画面而不是拼贴。</li>
+          </ol>
+          <table class="tut-table">
+            <tr><th>参考模式</th><th>含义</th><th>什么时候用</th></tr>
+            <tr><td>纯文本</td><td>只用文字描述，不传图</td><td>没有参考素材、快速试效果</td></tr>
+            <tr><td>reference 参考图</td><td>把图当「视觉与分镜基准」，模型参考构图和内容重新生成</td><td><b>用宫格图出视频就选这个</b></td></tr>
+            <tr><td>keyframe 首帧</td><td>把图直接当视频第一帧，之后画面从这一帧动起来</td><td>只有一张产品图、想让画面从它开始动</td></tr>
+          </table>
+          <div class="tut-note">宫格图如果一次不满意，直接再点一次生成即可，每张都会进「追画区域」，可以对比挑一张当参考。</div>
+        </section>
+
+        <section class="tut-sec" id="tut5">
+          <h3><i>⑤</i>生成 30 秒广告</h3>
+          <p class="tut-lead">国内视频接口单次一般最多 10–12 秒，所以 30 秒是「分段生成 + 本地合并」做的。</p>
+          <ol class="tut-steps">
+            <li>点页面顶部 <b>「⚡ 一键生成 30S 广告（国内）」</b>。</li>
+            <li>系统会自动：生成叙事提示词 → 生成主视觉图 → 生成视频提示词 → <b>分 3 段各 10 秒</b>依次生成 → 本地拼成一条 30 秒成片。</li>
+            <li>成片保存在项目的 <code>outputs/</code> 目录，同时视频历史里能看到 3 个分段。</li>
+          </ol>
+          <div class="tut-warn">
+            <b>重要：30 秒合并必须在本地运行。</b>视频下载和 ffmpeg 合并需要一个本地服务，所以要在项目目录执行 <code>node server.js</code>，然后访问 <code>http://127.0.0.1:8787</code>。直接打开线上网址时，合并这一步不可用（会提示需要本地运行），但单段视频照常能生成。
+          </div>
+        </section>
+
+        <section class="tut-sec" id="tut6">
+          <h3><i>⑥</i>各模块速查</h3>
+          <table class="tut-table tut-table-wide">
+            <tr><th>编号</th><th>模块</th><th>作用</th></tr>
+            <tr><td>1</td><td>产品信息</td><td>全站的信息源头，所有提示词都从这里取</td></tr>
+            <tr><td>2</td><td>生成提示词</td><td>用文本模型写图片叙事提示词</td></tr>
+            <tr><td>3</td><td>提示词预览</td><td>看结果、手动改，改完再出图</td></tr>
+            <tr><td>4</td><td>图像生成</td><td>出主视觉图，可设比例、数量</td></tr>
+            <tr><td>5</td><td>分镜宫格图</td><td>出 4/6/9 格分镜，可直接设为视频参考图</td></tr>
+            <tr><td>6</td><td>追画区域</td><td>所有生成过的图片都在这里，可复用、可清空</td></tr>
+            <tr><td>7</td><td>生成视频提示词</td><td>写 A-roll 口播 + B-roll 镜头提示词</td></tr>
+            <tr><td>8</td><td>视频提示词</td><td>看结果、手动改</td></tr>
+            <tr><td>9</td><td>视频生成</td><td>选参考模式、时长、比例，出视频</td></tr>
+            <tr><td>10</td><td>视频历史</td><td>所有视频和失败原因都在这里</td></tr>
+          </table>
+        </section>
+
+        <section class="tut-sec" id="tut7">
+          <h3><i>⑦</i>常见问题</h3>
+          <div class="tut-faq">
+            <details open><summary>提示「图片接口未配置完整」</summary><p>设置面板里图片标签页的 Base URL、API Key、模型名至少缺一项。点「⚙ 设置 → 图片模型」补齐后保存。</p></details>
+            <details><summary>提示「免费用户 API 速率限制」或 429</summary><p>这是服务商的<b>每分钟请求数限制</b>（免费账户通常很低，且未实名认证时更低）。等 1–5 分钟再试即可，不用改任何配置。连续快速点按钮最容易触发。</p></details>
+            <details><summary>提示「视频队列已满 / video_queue_full」</summary><p>这是服务商<b>视频生成排队满了</b>，与你的密钥和配置无关。换时段（深夜、清晨）再试成功率高很多。网站已内置自动重试，但无法绕过服务端排队。</p></details>
+            <details><summary>视频只有 10 秒左右，怎么出 30 秒</summary><p>国内视频接口单次上限一般 10–12 秒。用顶部「⚡ 一键生成 30S 广告」，它会自动分 3 段生成再本地合并。合并需要本地跑 <code>node server.js</code>。</p></details>
+            <details><summary>生成的图片/视频在哪里</summary><p>图片在模块 6「追画区域」，视频在模块 10「视频生成历史」。左侧导航的这两个入口上有数量角标。点缩略图可全屏预览，也可以直接右键另存。</p></details>
+            <details><summary>我的 API Key 安全吗</summary><p>密钥只写在你自己浏览器的本地存储里，不会发到本网站的任何服务器，源码里也没有内置任何密钥。但请不要在公共电脑上保存密钥，用完记得在设置里清空。</p></details>
+            <details><summary>想换成可灵 / 即梦 / 硅基流动 / Runway 等其它服务商</summary><p>设置面板里每一项都可以改：Base URL、接口路径、请求头、请求体模板、结果提取路径。请求体里用 <code>{{prompt}}</code>、<code>{{model}}</code>、<code>{{duration}}</code>、<code>{{ratio}}</code>、<code>{{imageUrl}}</code> 这类占位符，接口文档怎么写就怎么填。<b>参考图模式</b>的占位符是 <code>{{imagesJson}}</code>（图片 URL 数组）和 <code>{{firstFrame}}</code>（首帧图 URL）。</p></details>
+            <details><summary>图片或视频加载不出来</summary><p>多半是跨域（CORS）。本地运行时网站会自动走内置代理 <code>/api/proxy</code>；线上静态托管无法代理，某些服务商的资源链接会加载失败。这种情况建议本地运行使用。</p></details>
+          </div>
+        </section>
+
+      </div>
+    </div>
+    <div class="modal-foot">
+      <div class="security-note">教程随时可以从左侧导航「使用教程」或右上角「? 教程」再次打开。</div>
+      <button class="btn btn-outline" id="btnTutClose2">关闭</button>
+      <button class="btn btn-primary" id="btnTutStart">知道了，开始使用</button>
+    </div>
   </div>
 </div>
 
