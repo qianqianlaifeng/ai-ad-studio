@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 广告创作台 · 一键生成 155 广告</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">✦</div>
+      <div><div class="brand-name">AI 创作台</div><div class="brand-sub">AD STUDIO</div></div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-title">连接</div>
+      <button class="nav-item" data-jump="settings"><span class="nav-ico">⚿</span>API Key</button>
+
+      <div class="nav-group-title">工具</div>
+      <button class="nav-item" data-jump="mod1"><span class="nav-ico">◇</span>大语言模型</button>
+      <button class="nav-item" data-jump="mod5"><span class="nav-ico">▧</span>图像生成 <span class="caret">▾</span></button>
+      <button class="nav-item sub" data-jump="mod5"><span class="nav-ico">▫</span>生图</button>
+      <button class="nav-item sub" data-jump="mod1"><span class="nav-ico">▫</span>电商详情图</button>
+      <button class="nav-item" data-jump="mod9"><span class="nav-ico">▶</span>视频生成 <span class="caret">▾</span></button>
+      <button class="nav-item sub" data-jump="mod9"><span class="nav-ico">▫</span>视频生视频</button>
+      <button class="nav-item accent" data-jump="top"><span class="nav-ico">✦</span>一键生成 155 广告</button>
+
+      <div class="nav-group-title">记录</div>
+      <button class="nav-item" data-jump="mod6"><span class="nav-ico">▤</span>追画区域</button>
+      <button class="nav-item" data-jump="mod10"><span class="nav-ico">▣</span>视频历史</button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="conn-dot" id="connDot"></div>
+      <div class="conn-text" id="connText">尚未配置接口</div>
+      <button class="mini-btn" data-jump="settings">配置接口</button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="crumb">工作台 /</span>
+        <span class="topbar-title" id="topTitle">一键生成 155 广告</span>
+      </div>
+      <div class="topbar-right">
+        <span class="pill" id="modelPill">未配置模型</span>
+        <button class="icon-btn" id="btnSettings" title="接口与密钥设置">⚙ 设置</button>
+      </div>
+    </header>
+
+    <main class="workspace" id="top">
+      <section class="hero card">
+        <div class="hero-main">
+          <div class="hero-badge">✦ 全流程工作台</div>
+          <h1>一键生成 155 广告</h1>
+          <p>产品信息 → 叙事提示词 → 图像生成 → 视频提示词 → 视频成片。文本、图片、视频模型均可接入你自己的接口与密钥。</p>
+          <div class="progress-wrap" id="progressWrap" hidden>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <span class="progress-label" id="progressLabel">准备中…</span>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <div class="hero-btn-row">
+            <button class="btn btn-outline" id="btnAll">✦ 一键生成全部</button>
+            <button class="btn btn-primary btn-lg" id="btnAll30">✦ 一键生成 30S 广告（国内）</button>
+          </div>
+          <div class="hero-hint" id="heroHint">先填写产品信息，或直接运行内置模板</div>
+        </div>
+      </section>
+
+      <div class="work-grid">
+        <div class="column">
+          <!-- 1 -->
+          <section class="card module" id="mod1">
+            <div class="module-head"><span class="num">1</span><h2>产品信息</h2><span class="tag">输入</span></div>
+            <div class="module-body form-grid">
+              <label class="field"><span>产品名称</span><input id="pName" value="Classic Checkered Baby Cashmere" placeholder="例如：经典格纹羊绒毯"></label>
+              <label class="field"><span>核心卖点</span><textarea id="pSell" rows="3" placeholder="材质、工艺、差异点，用逗号分隔">羊绒混纺, 经典格纹, 柔软亲肤, 可机洗</textarea></label>
+              <label class="field"><span>画面风格</span><input id="pStyle" value="高级电商广告摄影，柔和自然光，暖色调"></label>
+              <label class="field"><span>使用场景</span><input id="pScene" value="海边日落的高端野餐场景"></label>
+              <label class="field"><span>主色 / 品牌色</span><input id="pColor" value="米白、焦糖棕、深海蓝"></label>
+              <label class="field"><span>视频时长（秒）</span><input id="pDuration" type="number" min="5" max="60" value="15"></label>
+            </div>
+          </section>
+
+          <!-- 3 -->
+          <section class="card module" id="mod3">
+            <div class="module-head"><span class="num">3</span><h2>大语言模型生成提示词</h2><span class="status" id="statusPrompt">就绪</span></div>
+            <div class="module-body">
+              <div class="strategy" id="strategyPreview"></div>
+              <button class="btn btn-outline full" id="btnGenPrompt">◇ 生成叙事提示词</button>
+              <div class="hint">未配置文本接口时自动使用内置「叙事与重构」模板。</div>
+            </div>
+          </section>
+
+          <!-- 4 -->
+          <section class="card module" id="mod4">
+            <div class="module-head"><span class="num">4</span><h2>提示词预览</h2><button class="mini-btn" id="btnCopyImagePrompt">复制</button></div>
+            <div class="module-body">
+              <textarea id="imagePrompt" class="prompt-area" rows="12" spellcheck="false" placeholder="这里会显示生成的完整提示词（可手动编辑）"></textarea>
+              <div class="meta-line"><span id="promptCount">0 字</span><span>可直接手动修改，图像生成以此处内容为准</span></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="column">
+          <!-- 5 -->
+          <section class="card module" id="mod5">
+            <div class="module-head"><span class="num">5</span><h2>图像生成模块</h2><span class="tag" id="imageChannel">通道：未配置</span></div>
+            <div class="module-body">
+              <div class="sub-title">模型选择</div>
+              <div class="chip-row" id="imageModels">
+                <button class="chip active" data-model="">使用配置模型</button>
+                <button class="chip" data-model="Nano Banana 2">Nano Banana 2</button>
+                <button class="chip" data-model="Nano Banana Pro">Nano Banana Pro</button>
+                <button class="chip" data-model="flux-pro">flux-pro</button>
+                <button class="chip" data-model="Kolors">Kolors</button>
+              </div>
+              <div class="sub-title">画面比例</div>
+              <div class="chip-row" id="ratioRow">
+                <button class="chip" data-ratio="自由">自由</button>
+                <button class="chip" data-ratio="1:1">1:1</button>
+                <button class="chip" data-ratio="2:3">2:3</button>
+                <button class="chip" data-ratio="3:2">3:2</button>
+                <button class="chip" data-ratio="3:4">3:4</button>
+                <button class="chip" data-ratio="4:3">4:3</button>
+                <button class="chip" data-ratio="4:5">4:5</button>
+                <button class="chip" data-ratio="5:4">5:4</button>
+                <button class="chip" data-ratio="9:16">9:16</button>
+                <button class="chip active" data-ratio="16:9">16:9</button>
+                <button class="chip" data-ratio="2:1">2:1</button>
+                <button class="chip" data-ratio="1:2">1:2</button>
+              </div>
+              <div class="row-2">
+                <label class="field"><span>尺寸</span><select id="imageSize"><option value="1024">1024px</option><option value="2k">2K</option><option value="4k">4K</option></select></label>
+                <label class="field"><span>生成数量</span><select id="imageCount"><option>1</option><option>2</option><option>4</option></select></label>
+              </div>
+              <button class="btn btn-primary full" id="btnGenImage">✧ 开始生成</button>
+            </div>
+          </section>
+
+          <!-- 6 -->
+          <section class="card module" id="mod6">
+            <div class="module-head"><span class="num">6</span><h2>追画区域</h2><button class="mini-btn" id="btnClearImages">清空</button></div>
+            <div class="module-body"><div class="history-list" id="imageHistory"></div></div>
+          </section>
+        </div>
+
+        <div class="column">
+          <!-- 7 -->
+          <section class="card module" id="mod7">
+            <div class="module-head"><span class="num">7</span><h2>大语言模型生成视频提示词</h2><span class="status" id="statusVideoPrompt">就绪</span></div>
+            <div class="module-body">
+              <div class="strategy" id="videoStrategyPreview"></div>
+              <button class="btn btn-pink full" id="btnGenVideoPrompt">✦ 生成视频提示词</button>
+            </div>
+          </section>
+
+          <!-- 8 -->
+          <section class="card module" id="mod8">
+            <div class="module-head"><span class="num">8</span><h2>大语言模型输出视频提示词</h2><button class="mini-btn" id="btnCopyVideoPrompt">复制</button></div>
+            <div class="module-body">
+              <textarea id="videoPrompt" class="prompt-area" rows="7" spellcheck="false" placeholder="生成的视频提示词会显示在这里（可手动编辑）"></textarea>
+              <div class="meta-line"><span id="videoPromptCount">0 字</span><span>可直接编辑</span></div>
+            </div>
+          </section>
+
+          <!-- 9 -->
+          <section class="card module" id="mod9">
+            <div class="module-head"><span class="num">9</span><h2>视频生成</h2><span class="tag" id="videoChannel">通道：未配置</span><span class="status" id="statusVideo">就绪</span></div>
+            <div class="module-body">
+              <div class="row-2">
+                <label class="field"><span>Enhance</span><select id="enhance"><option>有</option><option>无</option></select></label>
+                <label class="field"><span>首帧参考图</span><select id="refSource"><option value="none">不使用</option><option value="latest">使用追画区域最新图</option></select></label>
+              </div>
+              <div class="ref-preview" id="refPreview" hidden><img id="refImg" alt="参考图"><button class="mini-btn" id="btnClearRef">移除</button></div>
+              <label class="field"><span>视频提示词</span><textarea id="videoGenPrompt" rows="4" spellcheck="false" placeholder="将模块 8 的提示词同步到这里，也可直接编辑"></textarea></label>
+              <div class="row-2">
+                <label class="field"><span>单次时长（秒，接口上限 12s）</span><input type="range" id="videoDuration" min="4" max="12" value="10"><b id="durationVal">10s</b></label>
+                <label class="field"><span>分辨率 / FPS</span><div class="inline"><select id="videoRes"><option value="540p">540p</option><option value="720p" selected>720p</option><option value="1080p">1080p</option></select><select id="videoFps"><option>24</option><option selected>30</option><option>60</option></select></div></label>
+              </div>
+              <button class="btn btn-primary full" id="btnGenVideo">▶ 生成视频</button>
+              <div class="hint" id="videoHint">异步任务自动轮询，最长等待 10 分钟。需 30 秒成片请使用顶部「一键生成 30S 广告」，会自动分 3 段并本地合并。</div>
+            </div>
+          </section>
+
+          <!-- 10 -->
+          <section class="card module" id="mod10">
+            <div class="module-head"><span class="num">10</span><h2>视频生成历史</h2><button class="mini-btn" id="btnClearVideos">清空</button></div>
+            <div class="module-body"><div class="history-list" id="videoHistory"></div></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- 设置弹层 -->
+<div class="overlay" id="settingsOverlay" hidden>
+  <div class="modal settings-modal">
+    <div class="modal-head">
+      <h2>接口与密钥设置</h2>
+      <button class="icon-btn" id="btnCloseSettings">✕</button>
+    </div>
+    <div class="settings-tabs" id="settingsTabs">
+      <button class="tab active" data-tab="text">文本模型</button>
+      <button class="tab" data-tab="image">图片模型</button>
+      <button class="tab" data-tab="video">视频模型</button>
+      <button class="tab" data-tab="general">通用</button>
+    </div>
+    <div class="agnes-bar">
+      <div><b>国内 Agnes AI</b><span>文本 / 图片 / 视频一键填入（密钥仅存本机）</span></div>
+      <button class="btn btn-outline" id="btnAgnesSetup">一键填入国内配置</button>
+    </div>
+    <div class="modal-body" id="settingsForms"></div>
+    <div class="modal-foot">
+      <div class="security-note">密钥仅保存在本机浏览器的 localStorage 中，不会上传到本网站服务器。</div>
+      <button class="btn btn-outline" id="btnResetConfig">恢复默认</button>
+      <button class="btn btn-primary" id="btnSaveConfig">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="lightbox" hidden>
+  <div class="lightbox-inner"><button class="icon-btn" id="btnCloseLightbox">✕</button><img id="lightboxImg" alt="预览"></div>
+</div>
+<div id="toastBox" class="toast-box"></div>
+
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
