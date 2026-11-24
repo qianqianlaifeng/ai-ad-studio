@@ -2,14 +2,15 @@
 (function (global) {
   'use strict';
 
-  var STORAGE_KEY = 'ai_studio_config_v1';
+  // v2：不再读取旧版自动填入的厂商模板，所有人打开都是空白配置
+  var STORAGE_KEY = 'ai_studio_config_v2';
 
   var DEFAULT_CONFIG = {
     text: {
-      preset: 'openai',
-      baseUrl: 'https://api.openai.com/v1',
+      preset: 'custom',
+      baseUrl: '',
       apiKey: '',
-      model: 'gpt-4o-mini',
+      model: '',
       path: '/chat/completions',
       headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}',
       body: '{"model":{{model}},"messages":{{messages}},"temperature":0.8}',
@@ -17,10 +18,10 @@
       timeout: 120000
     },
     image: {
-      preset: 'openai',
-      baseUrl: 'https://api.openai.com/v1',
+      preset: 'custom',
+      baseUrl: '',
       apiKey: '',
-      model: 'gpt-image-1',
+      model: '',
       path: '/images/generations',
       headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}',
       body: '{"model":{{model}},"prompt":{{prompt}},"n":{{n}},"size":{{size}}}',
@@ -29,7 +30,7 @@
       timeout: 180000
     },
     video: {
-      preset: 'async',
+      preset: 'custom',
       baseUrl: '',
       apiKey: '',
       model: '',
@@ -84,12 +85,6 @@
         body: '{"contents":[{"parts":[{"text":{{prompt}}}]}],"generationConfig":{"temperature":0.8}}',
         response: 'candidates.0.content.parts.0.text,candidates.0.content.parts.1.text'
       },
-      agnes: {
-        baseUrl: 'https://api.agnes-ai.cn/v1', path: '/chat/completions', model: 'agnes-3.0-flash',
-        headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}',
-        body: '{"model":{{model}},"messages":{{messages}},"temperature":0.8}',
-        response: 'choices.0.message.content,response'
-      },
       custom: { baseUrl: '', path: '/chat/completions', model: '', headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}' }
     },
     image: {
@@ -112,12 +107,6 @@
         body: '{"contents":[{"parts":[{"text":{{prompt}}}]}]}',
         resultPaths: 'candidates.0.content.parts.0.inlineData.data,candidates.0.content.parts.1.inlineData.data,data.0.url,url'
       },
-      agnes: {
-        baseUrl: 'https://api.agnes-ai.cn/v1', path: '/images/generations', model: 'agnes-image-2.5-flash',
-        headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}',
-        body: '{"model":{{model}},"prompt":{{prompt}},"n":{{n}},"size":{{size}}}',
-        resultPaths: 'data.0.url,data.0.b64_json,url'
-      },
       custom: { baseUrl: '', path: '/images/generations', model: '', headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}' }
     },
     video: {
@@ -136,24 +125,18 @@
         taskPaths: '', statusPaths: '',
         resultPaths: 'video.url,video_url,data.video_url,data.url,output.url,url'
       },
-      agnes: {
-        baseUrl: 'https://api.agnes-ai.cn/v1', path: '/videos', queryPath: '/videos/{{taskId}}', queryMethod: 'GET',
-        // 接口实测：agnes-video-v2.5 返回 model_not_found；可用的是 agnes-video-2.5 / agnes-video-2.5-flash
-        model: 'agnes-video-2.5-flash',
+      custom: {
+        baseUrl: '', path: '/videos/generations', queryPath: '/videos/{{taskId}}', queryMethod: 'GET', model: '',
         headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}',
-        body: '{"model":{{model}},"prompt":{{prompt}},"mode":"text","seconds":{{duration}},"size":"720P","aspect_ratio":{{ratio}}}',
-        // 实测：reference 模式只认 images 数组（image 会被当成 first_frame 并报冲突）；keyframe 模式认 first_frame / image
-        bodyRef: '{"model":{{model}},"prompt":{{prompt}},"mode":"reference","seconds":{{duration}},"size":"720P","aspect_ratio":{{ratio}},"images":{{imagesJson}}}',
-        bodyKeyframe: '{"model":{{model}},"prompt":{{prompt}},"mode":"keyframe","seconds":{{duration}},"size":"720P","aspect_ratio":{{ratio}},"first_frame":{{imageUrl}}}',
-        taskPaths: 'task_id,id,video_id',
-        statusPaths: 'status',
-        successValues: 'completed',
-        failValues: 'failed,cancelled,error',
-        resultPaths: 'metadata.url,video_url,remixed_from_video_id,data.url,url',
-        pollMs: 5000,
+        body: '{"model":{{model}},"prompt":{{prompt}},"ratio":{{ratio}},"duration":{{duration}},"resolution":{{resolution}},"fps":{{fps}},"image":{{imageUrl}}}',
+        taskPaths: 'id,task_id,data.id,data.task_id,output.task_id,task.id',
+        statusPaths: 'status,data.status,task.status,output.task_status,state',
+        successValues: 'succeeded,success,completed,done,finished',
+        failValues: 'failed,fail,cancelled,canceled,error',
+        resultPaths: 'video.url,video_url,videoUrl,metadata.url,data.video_url,data.url,output.video_url,output.url,videos.0.url,url',
+        pollMs: 4000,
         timeout: 600000
-      },
-      custom: { baseUrl: '', path: '', queryPath: '', model: '', headers: '{"Authorization":"Bearer {{key}}","Content-Type":"application/json"}' }
+      }
     }
   };
 
@@ -169,6 +152,8 @@
 
   function loadConfig() {
     try {
+      // 清掉旧版残留配置（含旧密钥），只读 v2
+      localStorage.removeItem('ai_studio_config_v1');
       var raw = localStorage.getItem(STORAGE_KEY);
       var cfg = raw ? deepMerge(DEFAULT_CONFIG, JSON.parse(raw)) : deepMerge(DEFAULT_CONFIG, {});
       // 兼容旧配置：预设新增的参考图模板自动补全，避免旧 localStorage 里 bodyRef 为空导致参考模式失效

@@ -426,18 +426,18 @@
           <p class="tut-lead">这个工作台不绑定服务商，文本、图片、视频三个模型都接你自己的接口和密钥。配置一次，之后一直有效。</p>
           <ol class="tut-steps">
             <li>点右上角 <b>⚙ 设置</b>（或左侧导航「API Key」）打开设置面板。</li>
-            <li>如果用的是国内 <b>Agnes AI</b>：点 <b>「一键填入国内配置」</b>，Base URL、接口路径、模型名会自动填好，你只需要粘贴自己的 API Key。</li>
-            <li>在 <b>文本模型 / 图片模型 / 视频模型</b> 三个标签页里<b>各粘贴一次 API Key</b>（三个标签页是独立的，不会互相覆盖）。</li>
+            <li>三个标签页各自填写：<b>接口地址 Base URL</b>、<b>模型名称</b>、<b>你自己的 API Key</b>。网站不预置任何厂商地址或模型，全部由你决定。</li>
+            <li>如果服务商提供的是 OpenAI 兼容接口，可选上方「服务商预设」快速填入通用格式；不用预设就保持 <b>custom</b>，按服务商文档填即可。</li>
             <li>点 <b>「保存设置」</b>。右上角显示模型名、左下角圆点变绿，就说明配置成功了。</li>
           </ol>
           <div class="tut-warn">
             <b>最容易错的一点：</b>三个模型名<b>必须各填各的</b>，不要互相复制。文本、图片、视频的模型名是不同的三个名字，混填会直接报「模型不存在」。
           </div>
           <table class="tut-table">
-            <tr><th>标签页</th><th>国内 Agnes 该填什么</th><th>作用</th></tr>
-            <tr><td>文本模型</td><td><code>agnes-3.0-flash</code></td><td>写叙事提示词、视频提示词</td></tr>
-            <tr><td>图片模型</td><td><code>agnes-image-2.5-flash</code></td><td>生成主视觉图、分镜宫格图</td></tr>
-            <tr><td>视频模型</td><td><code>agnes-video-2.5-flash</code></td><td>图生视频 / 文生视频</td></tr>
+            <tr><th>标签页</th><th>需要你填什么</th><th>作用</th></tr>
+            <tr><td>文本模型</td><td>你的文本接口地址 + 模型名 + Key</td><td>写叙事提示词、视频提示词</td></tr>
+            <tr><td>图片模型</td><td>你的图片接口地址 + 模型名 + Key</td><td>生成主视觉图、分镜宫格图</td></tr>
+            <tr><td>视频模型</td><td>你的视频接口地址 + 模型名 + Key</td><td>图生视频 / 文生视频</td></tr>
           </table>
           <p class="tut-note">密钥只保存在你自己浏览器的本地存储里，不会上传到任何服务器。换电脑或清缓存后需要重新填一次。</p>
         </section>
@@ -568,10 +568,6 @@
       <button class="tab" data-tab="image">图片模型</button>
       <button class="tab" data-tab="video">视频模型</button>
       <button class="tab" data-tab="general">通用</button>
-    </div>
-    <div class="agnes-bar">
-      <div><b>可选：Agnes 接口模板</b><span>只填地址和模型名，不含任何密钥；填入后请自己填 API Key</span></div>
-      <button class="btn btn-outline" id="btnAgnesSetup">填入 Agnes 模板（无密钥）</button>
     </div>
     <div class="modal-body" id="settingsForms"></div>
     <div class="modal-foot">

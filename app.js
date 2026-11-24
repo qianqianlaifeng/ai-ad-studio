@@ -541,10 +541,10 @@
   /* ---------- 界面配置 ---------- */
   var SCHEMA = {
     text: [
-      { k: 'preset', label: '服务商预设', type: 'preset', wide: true, options: ['agnes', 'openai', 'openrouter', 'deepseek', 'siliconflow', 'gemini', 'custom'] },
-      { k: 'baseUrl', label: '接口地址 Base URL', placeholder: 'https://api.openai.com/v1', wide: true },
-      { k: 'apiKey', label: 'API Key', type: 'secret', placeholder: 'sk-...', wide: true },
-      { k: 'model', label: '模型名称（与其他模型独立）', placeholder: 'gpt-4o-mini', suggestions: ['agnes-3.0-flash', 'agnes-2.5-flash', 'gpt-4o-mini'] },
+      { k: 'preset', label: '服务商预设（可选，不用就选 custom 自己填）', type: 'preset', wide: true, options: ['custom', 'openai', 'openrouter', 'deepseek', 'siliconflow', 'gemini'] },
+      { k: 'baseUrl', label: '接口地址 Base URL（请填你自己的）', placeholder: 'https://你的接口域名/v1', wide: true },
+      { k: 'apiKey', label: 'API Key（请填你自己的）', type: 'secret', placeholder: 'sk-...', wide: true },
+      { k: 'model', label: '模型名称（请填你自己的）', placeholder: '例如 gpt-4o-mini' },
       { k: 'path', label: '接口路径', placeholder: '/chat/completions' },
       { k: 'headers', label: '请求头模板（JSON，支持 {{key}}）', type: 'code', wide: true },
       { k: 'body', label: '请求体模板（JSON，支持 {{model}} {{messages}} {{prompt}}）', type: 'code', wide: true },
@@ -552,10 +552,10 @@
       { k: 'timeout', label: '超时（毫秒）', type: 'number', wide: true }
     ],
     image: [
-      { k: 'preset', label: '服务商预设', type: 'preset', wide: true, options: ['agnes', 'openai', 'siliconflow', 'gemini', 'custom'] },
-      { k: 'baseUrl', label: '接口地址 Base URL', placeholder: 'https://api.openai.com/v1', wide: true },
-      { k: 'apiKey', label: 'API Key', type: 'secret', placeholder: 'sk-...', wide: true },
-      { k: 'model', label: '模型名称（与其他模型独立）', placeholder: 'gpt-image-1', suggestions: ['agnes-image-2.5-flash', 'agnes-image-2.1-flash', 'gpt-image-1'] },
+      { k: 'preset', label: '服务商预设（可选，不用就选 custom 自己填）', type: 'preset', wide: true, options: ['custom', 'openai', 'siliconflow', 'gemini'] },
+      { k: 'baseUrl', label: '接口地址 Base URL（请填你自己的）', placeholder: 'https://你的接口域名/v1', wide: true },
+      { k: 'apiKey', label: 'API Key（请填你自己的）', type: 'secret', placeholder: 'sk-...', wide: true },
+      { k: 'model', label: '模型名称（请填你自己的）', placeholder: '例如 gpt-image-1' },
       { k: 'path', label: '接口路径', placeholder: '/images/generations' },
       { k: 'headers', label: '请求头模板（JSON）', type: 'code', wide: true },
       { k: 'body', label: '请求体模板（{{prompt}} {{size}} {{n}} {{ratio}}）', type: 'code', wide: true },
@@ -563,10 +563,10 @@
       { k: 'timeout', label: '超时（毫秒）', type: 'number', wide: true }
     ],
     video: [
-      { k: 'preset', label: '服务商预设', type: 'preset', wide: true, options: ['agnes', 'async', 'sync', 'custom'] },
-      { k: 'baseUrl', label: '接口地址 Base URL', placeholder: 'https://your-video-api.com', wide: true },
-      { k: 'apiKey', label: 'API Key', type: 'secret', placeholder: 'ak-...', wide: true },
-      { k: 'model', label: '模型名称（与其他模型独立）', placeholder: '例如 agnes-video-2.5-flash', suggestions: ['agnes-video-2.5-flash', 'agnes-video-2.5', 'agnes-video-v2.5'] },
+      { k: 'preset', label: '服务商预设（可选，不用就选 custom 自己填）', type: 'preset', wide: true, options: ['custom', 'async', 'sync'] },
+      { k: 'baseUrl', label: '接口地址 Base URL（请填你自己的）', placeholder: 'https://你的接口域名', wide: true },
+      { k: 'apiKey', label: 'API Key（请填你自己的）', type: 'secret', placeholder: 'ak-...', wide: true },
+      { k: 'model', label: '模型名称（请填你自己的）', placeholder: '例如 your-video-model' },
       { k: 'path', label: '创建任务路径', placeholder: '/videos/generations' },
       { k: 'queryPath', label: '查询任务路径（{{taskId}}）', placeholder: '/videos/{{taskId}}' },
       { k: 'queryMethod', label: '查询方式（GET / POST）', placeholder: 'GET' },
@@ -990,25 +990,6 @@
     } catch (e) { S.busy.all = false; $('#btnAll').disabled = false; toast('流程异常：' + e.message, 'err'); }
   }
 
-  /* ---------- 国内 Agnes 配置与 30S 广告流程 ---------- */
-  // 安全：密钥绝不写入源码（公开仓库会泄露）。由使用者在设置页自行填写，
-  // 仅保存在其本机浏览器的 localStorage 中。
-  function applyAgnesConfig(silent) {
-    var cfg = merge(AIHub.DEFAULT_CONFIG, AIHub.loadConfig());
-    ['text', 'image', 'video'].forEach(function (kind) {
-      var existingKey = cfg[kind].apiKey || ''; // 保留用户已填写的密钥
-      cfg[kind] = merge(cfg[kind], AIHub.PRESETS[kind].agnes);
-      cfg[kind].preset = 'agnes';
-      cfg[kind].apiKey = existingKey;
-    });
-    AIHub.saveConfig(cfg);
-    S.cfg = AIHub.loadConfig();
-    draft = merge(AIHub.DEFAULT_CONFIG, S.cfg);
-    refreshConfigUI();
-    if (!$('#settingsOverlay').hidden) renderSettings();
-    if (!silent) toast('已填入 Agnes 接口模板（不含密钥）。请在三个标签页分别填你自己的 API Key，仅存本机。', 'ok');
-  }
-
   function lockFlowButtons(locked) {
     ['#btnAll', '#btnRun15', '#btnAll30', '#btnRun30'].forEach(function (id) { var el = $(id); if (el) el.disabled = locked; });
   }
@@ -1151,7 +1132,6 @@
       });
     });
     $('#btnSettings').addEventListener('click', function () { openSettings(); });
-    $('#btnAgnesSetup').addEventListener('click', function () { applyAgnesConfig(); });
     $$('#viewTabs .view-tab').forEach(function (b) {
       b.addEventListener('click', function () { switchView(this.dataset.view); });
     });
