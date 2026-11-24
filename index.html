@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>广告设计生成 · 一键生成 155 广告</title>
+<title>广告设计生成 · 一句话生成广告视频</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,16 +20,21 @@
       <div class="nav-group-title">连接</div>
       <button class="nav-item" data-jump="settings"><span class="nav-ico">⚿</span>API Key</button>
 
+      <div class="nav-group-title">智能入口</div>
+      <button class="nav-item accent nav-smart" data-view="smart"><span class="nav-ico">✦</span>一句话生成广告视频<span class="badge badge-new">新</span></button>
+
+      <div class="nav-group-title">广告类型</div>
+      <button class="nav-item accent" data-view="s15"><span class="nav-ico">◷</span>15 秒广告</button>
+      <button class="nav-item accent nav-30s" data-view="s30"><span class="nav-ico">⚡</span>30 秒广告</button>
+
       <div class="nav-group-title">工具</div>
       <button class="nav-item" data-jump="mod1"><span class="nav-ico">◇</span>大语言模型</button>
       <button class="nav-item" data-jump="mod5"><span class="nav-ico">▧</span>图像生成 <span class="caret">▾</span></button>
-      <button class="nav-item sub" data-jump="mod5"><span class="nav-ico">▫</span>生图</button>
-      <button class="nav-item sub" data-jump="mod1"><span class="nav-ico">▫</span>电商详情图</button>
+      <button class="nav-item sub" data-jump="modSmartImage"><span class="nav-ico">▫</span>一句话生图</button>
+      <button class="nav-item sub" data-jump="modDetail"><span class="nav-ico">▫</span>电商详情图</button>
       <button class="nav-item" data-jump="mod6"><span class="nav-ico">▦</span>分镜宫格图</button>
       <button class="nav-item" data-jump="mod10"><span class="nav-ico">▶</span>视频生成 <span class="caret">▾</span></button>
       <button class="nav-item sub" data-jump="mod10"><span class="nav-ico">▫</span>视频生视频</button>
-      <button class="nav-item accent" data-jump="top"><span class="nav-ico">✦</span>一键生成 155 广告</button>
-      <button class="nav-item accent nav-30s" data-jump="top"><span class="nav-ico">⚡</span>一键生成 30S 广告</button>
 
       <div class="nav-group-title">记录</div>
       <button class="nav-item" data-jump="mod7"><span class="nav-ico">▤</span>追画区域<span class="badge" id="navImageCount">0</span></button>
@@ -47,7 +52,7 @@
     <header class="topbar">
       <div class="topbar-left">
         <span class="crumb">工作台 /</span>
-        <span class="topbar-title" id="topTitle">一键生成 155 广告</span>
+        <span class="topbar-title" id="topTitle">一句话生成广告视频</span>
       </div>
       <div class="topbar-right">
         <span class="pill" id="modelPill">未配置模型</span>
@@ -56,33 +61,191 @@
       </div>
     </header>
 
+    <div class="viewbar">
+      <div class="view-tabs" id="viewTabs">
+        <button class="view-tab active" data-view="smart">✦ 一句话智能生成 <span class="tab-new">NEW</span></button>
+        <button class="view-tab" data-view="s15">◷ 15 秒广告</button>
+        <button class="view-tab" data-view="s30">⚡ 30 秒广告</button>
+      </div>
+      <div class="progress-wrap global-progress" id="progressWrap" hidden>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="progress-label" id="progressLabel">准备中…</span>
+      </div>
+      <div class="hero-hint global-hint" id="heroHint">先填写产品信息，或直接运行内置模板</div>
+    </div>
+
     <main class="workspace" id="top">
       <div class="first-tip" id="firstTip" hidden>
         <span class="first-tip-ico">👋</span>
-        <div class="first-tip-text"><b>第一次用？</b>先花 3 分钟看教程：配接口 → 一键出片 → 宫格图出视频，一条流程走完就会了。</div>
+        <div class="first-tip-text"><b>第一次用？</b>最省事的是「一句话智能生成」：写一句话、选广告类型，剩下的拆解卖点和写提示词交给内置模板。</div>
         <button class="btn btn-primary" id="btnFirstTipOpen">看教程</button>
         <button class="icon-btn" id="btnFirstTipClose" title="不再提示">✕</button>
       </div>
 
-      <section class="hero card">
-        <div class="hero-main">
-          <div class="hero-badge">✦ 全流程工作台</div>
-          <h1>一键生成 155 广告</h1>
-          <p>产品信息 → 叙事提示词 → 图像生成 → 视频提示词 → 视频成片。文本、图片、视频模型均可接入你自己的接口与密钥。</p>
-          <div class="progress-wrap" id="progressWrap" hidden>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-            <span class="progress-label" id="progressLabel">准备中…</span>
+      <!-- ============ 视图 1：一句话智能生成 ============ -->
+      <div class="view-panel" id="view-smart">
+        <section class="hero card hero-smart">
+          <div class="hero-main">
+            <div class="hero-badge">✦ 智能入口 · 内置提示词</div>
+            <h1>一句话生成广告视频</h1>
+            <p>不用会写提示词。写一句产品描述，选「口播 / 创意 / 宣传」等广告类型，系统自动拆卖点、套内置模板、出图出视频。不配接口也能拆卖点，出图出视频需要你自己的图片 / 视频接口。</p>
           </div>
-        </div>
-        <div class="hero-actions">
-          <div class="hero-btn-row">
-            <button class="btn btn-outline" id="btnAll">✦ 一键生成全部</button>
-            <button class="btn btn-primary btn-lg" id="btnAll30">✦ 一键生成 30S 广告（国内）</button>
-          </div>
-          <div class="hero-hint" id="heroHint">先填写产品信息，或直接运行内置模板</div>
-        </div>
-      </section>
+        </section>
+        <div class="work-grid work-grid-smart">
+          <section class="card module" id="modSmartInput">
+            <div class="module-head"><span class="num">1</span><h2>一句话说需求</h2><span class="tag">智能入口</span></div>
+            <div class="module-body">
+              <label class="field"><span>用一句话描述产品 / 需求</span><textarea id="smartSentence" rows="4" placeholder="例：一款可机洗的羊绒混纺格纹毯，海边野餐用，米白焦糖配色，送闺蜜很合适">一款可机洗的羊绒混纺格纹毯，海边野餐用，米白焦糖配色，送闺蜜很合适</textarea></label>
+              <div class="sub-title">广告类型（内置提示词随类型切换）</div>
+              <div class="chip-row" id="smartTypeRow">
+                <button class="chip active" data-type="koupai">🎙 口播带货</button>
+                <button class="chip" data-type="chuangyi">🎬 创意剧情</button>
+                <button class="chip" data-type="xuanchuan">✨ 品牌宣传</button>
+                <button class="chip" data-type="kaixiang">📦 开箱种草</button>
+                <button class="chip" data-type="cuxiao">💰 促销转化</button>
+                <button class="chip" data-type="zhiliang">🎞 质感大片</button>
+              </div>
+              <div class="row-2">
+                <label class="field"><span>目标时长</span><select id="smartDuration"><option value="15">15 秒广告</option><option value="30">30 秒广告（三段）</option></select></label>
+                <label class="field"><span>画面比例</span><select id="smartRatio"><option value="9:16" selected>9:16 竖屏（推荐）</option><option value="16:9">16:9 横屏</option><option value="1:1">1:1 方形</option></select></label>
+              </div>
+              <button class="btn btn-primary full" id="btnSmartAnalyze">🧠 智能拆解卖点</button>
+              <div class="hint">先本地规则秒拆；配了文本模型会再自动润色一版。拆完自动填到下方「产品信息」和提示词里。</div>
+            </div>
+          </section>
 
+          <section class="card module" id="modSmartBreakdown">
+            <div class="module-head"><span class="num">2</span><h2>卖点拆解（可改）</h2><span class="status" id="statusSmart">就绪</span></div>
+            <div class="module-body">
+              <div class="breakdown-grid" id="smartBreakdown"><div class="empty">点「智能拆解卖点」后，这里会列出产品名、卖点、场景、风格、主色和推荐镜头。</div></div>
+              <div class="row-2">
+                <button class="btn btn-outline full" id="btnSmartPrompts">✦ 生成内置提示词</button>
+                <button class="btn btn-primary full" id="btnSmartAll">🚀 一键生成广告视频</button>
+              </div>
+              <div class="hint" id="smartHint">想手动微调：改下方「产品信息」或提示词预览，再点生成即可。</div>
+            </div>
+          </section>
+
+          <section class="card module" id="modSmartImage">
+            <div class="module-head"><span class="num">3</span><h2>一句话生图</h2><span class="tag">内置提示词</span></div>
+            <div class="module-body">
+              <label class="field"><span>一句话说画面</span><textarea id="oneImgSentence" rows="2" placeholder="例：米白羊绒毯铺在海边野餐布上，日落暖光，高级电商主图">米白羊绒毯铺在海边野餐布上，日落暖光，高级电商主图</textarea></label>
+              <div class="sub-title">画面用途</div>
+              <div class="chip-row" id="oneImgStyleRow">
+                <button class="chip active" data-style="主图">电商主图</button>
+                <button class="chip" data-style="海报">氛围海报</button>
+                <button class="chip" data-style="社媒">社媒封面</button>
+                <button class="chip" data-style="细节">材质细节</button>
+              </div>
+              <div class="row-2">
+                <label class="field"><span>比例</span><select id="oneImgRatio"><option>3:4</option><option>1:1</option><option>9:16</option><option>16:9</option></select></label>
+                <label class="field"><span>张数</span><select id="oneImgCount"><option>1</option><option>2</option><option>4</option></select></label>
+              </div>
+              <button class="btn btn-primary full" id="btnOneImg">✧ 一句话生成图片</button>
+              <button class="mini-btn full-mini" id="btnOneImgPrompt">只生成提示词（不调用图片接口）</button>
+            </div>
+          </section>
+
+          <section class="card module" id="modDetail">
+            <div class="module-head"><span class="num">4</span><h2>电商详情图</h2><span class="tag">内置版式</span></div>
+            <div class="module-body">
+              <label class="field"><span>一句话说产品</span><textarea id="detailSentence" rows="2" placeholder="例：可机洗羊绒格纹毯，柔软亲肤，米白焦糖色，适合送礼">可机洗羊绒格纹毯，柔软亲肤，米白焦糖色，适合送礼</textarea></label>
+              <div class="sub-title">详情图类型</div>
+              <div class="chip-row" id="detailTypeRow">
+                <button class="chip active" data-detail="首屏海报">首屏海报</button>
+                <button class="chip" data-detail="卖点拆解">卖点拆解</button>
+                <button class="chip" data-detail="细节特写">细节特写</button>
+                <button class="chip" data-detail="场景氛围">场景氛围</button>
+                <button class="chip" data-detail="促销信息">促销信息</button>
+              </div>
+              <div class="hint">内置提示词会自动留白文字区、锁定商品外观，避免 AI 把中文字写乱码。</div>
+              <button class="btn btn-primary full" id="btnDetailImg">▤ 生成详情图</button>
+              <button class="mini-btn full-mini" id="btnDetailPrompt">只生成详情图提示词</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ============ 视图 2：15 秒广告 ============ -->
+      <div class="view-panel" id="view-s15" hidden>
+        <section class="hero card">
+          <div class="hero-main">
+            <div class="hero-badge">◷ 15 秒广告 · 单条快出</div>
+            <h1>15 秒广告</h1>
+            <p>短平快单条成片。默认单段 12 秒（接口上限），可选两段拼接精确 15 秒。节奏模板只作用于 15 秒，和 30 秒互不干扰。</p>
+          </div>
+          <div class="hero-actions">
+            <div class="hero-btn-row"><button class="btn btn-primary btn-lg" id="btnAll">✦ 一键生成 15S 广告</button></div>
+          </div>
+        </section>
+        <section class="card module config-card" id="mod15Config">
+          <div class="module-head"><span class="num">1</span><h2>15 秒 · 专属设置</h2><span class="tag">与 30 秒独立</span></div>
+          <div class="module-body">
+            <div class="config-cols">
+              <div>
+                <div class="sub-title">出片方式</div>
+                <div class="chip-row" id="s15ModeRow">
+                  <button class="chip active" data-mode="single">单段 12s（最快）</button>
+                  <button class="chip" data-mode="two">两段拼接 15s（8s+7s）</button>
+                </div>
+                <div class="hint">视频接口单次上限 12 秒；选两段拼接需本地 <code>node server.js</code> 合并。</div>
+              </div>
+              <div>
+                <div class="sub-title">节奏模板</div>
+                <div class="chip-row" id="s15PaceRow">
+                  <button class="chip active" data-pace="hook">钩子先行</button>
+                  <button class="chip" data-pace="story">反转小剧情</button>
+                  <button class="chip" data-pace="hero">产品英雄</button>
+                </div>
+                <div class="hint">节奏只写进 15 秒视频提示词，不会带进 30 秒。</div>
+              </div>
+            </div>
+            <button class="btn btn-primary full" id="btnRun15">✦ 用当前产品信息生成 15S 广告</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ 视图 3：30 秒广告 ============ -->
+      <div class="view-panel" id="view-s30" hidden>
+        <section class="hero card hero-30">
+          <div class="hero-main">
+            <div class="hero-badge">⚡ 30 秒广告 · 三段拼接</div>
+            <h1>30 秒广告</h1>
+            <p>长广告走「分段生成 + 本地合并」。三段各自带不同的画面任务，不是同一句话重复三次。合并需要本地服务；线上静态版能出三段，合并会给出提示。</p>
+          </div>
+          <div class="hero-actions">
+            <div class="hero-btn-row"><button class="btn btn-primary btn-lg" id="btnAll30">⚡ 一键生成 30S 广告</button></div>
+          </div>
+        </section>
+        <section class="card module config-card" id="mod30Config">
+          <div class="module-head"><span class="num">1</span><h2>30 秒 · 专属设置</h2><span class="tag">分段策略</span></div>
+          <div class="module-body">
+            <div class="config-cols">
+              <div>
+                <div class="sub-title">分段方案</div>
+                <div class="chip-row" id="s30PlanRow">
+                  <button class="chip active" data-plan="3x10">3 段 × 10 秒</button>
+                  <button class="chip" data-plan="2x12">2×12 秒 + 6 秒尾板</button>
+                </div>
+                <div class="hint">默认 3 段，每段单独写画面任务。</div>
+              </div>
+              <div>
+                <div class="sub-title">叙事结构</div>
+                <div class="chip-row" id="s30StoryRow">
+                  <button class="chip active" data-story="classic">大场景 → 产品 → 收尾</button>
+                  <button class="chip" data-story="pain">痛点 → 解决 → 见证</button>
+                  <button class="chip" data-story="brand">世界观 → 质感 → 定格</button>
+                </div>
+                <div class="hint">结构决定三段分别演什么，改这里三段内容会真的变。</div>
+              </div>
+            </div>
+            <div class="merge-note">⚠ 合并需要本地服务：在项目目录运行 <code>node server.js</code>，再用 <code>http://127.0.0.1:8787</code> 打开页面。线上静态版只出三段，不合并。</div>
+            <button class="btn btn-primary full" id="btnRun30">⚡ 用当前产品信息生成 30S 广告</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="shared-divider card" id="sharedArea"><b>高级工作台</b><span>下面 10 个模块由三个视图共用，可看提示词、手改、单独出图出视频</span></div>
       <div class="work-grid">
         <div class="column">
           <!-- 1 -->
@@ -254,6 +417,7 @@
         <button data-tut="tut5">⑤ 30 秒广告</button>
         <button data-tut="tut6">⑥ 各模块速查</button>
         <button data-tut="tut7">⑦ 常见问题</button>
+        <button data-tut="tut8">⑧ 一句话智能生成（新）</button>
       </nav>
       <div class="tut-content" id="tutContent">
 
@@ -283,7 +447,7 @@
           <p class="tut-lead">不想一步步点，用这个。整条流水线自动跑完。</p>
           <ol class="tut-steps">
             <li>在模块 <b>1 产品信息</b> 里填产品名、核心卖点、主色、场景、风格、受众（已经预置了一套示例，可以直接改）。</li>
-            <li>点页面顶部 <b>「✦ 一键生成全部」</b>。</li>
+            <li>切到 <b>「15 秒广告」</b> 标签页，点 <b>「✦ 一键生成 15S 广告」</b>。</li>
             <li>进度条会依次显示：叙事提示词 → 主视觉图 → 视频提示词 → 视频。中途不用管。</li>
             <li>跑完后：图片在 <b>6 追画区域</b>，视频在 <b>10 视频生成历史</b>，点缩略图可全屏预览。</li>
           </ol>
@@ -366,6 +530,19 @@
             <details><summary>想换成可灵 / 即梦 / 硅基流动 / Runway 等其它服务商</summary><p>设置面板里每一项都可以改：Base URL、接口路径、请求头、请求体模板、结果提取路径。请求体里用 <code>{{prompt}}</code>、<code>{{model}}</code>、<code>{{duration}}</code>、<code>{{ratio}}</code>、<code>{{imageUrl}}</code> 这类占位符，接口文档怎么写就怎么填。<b>参考图模式</b>的占位符是 <code>{{imagesJson}}</code>（图片 URL 数组）和 <code>{{firstFrame}}</code>（首帧图 URL）。</p></details>
             <details><summary>图片或视频加载不出来</summary><p>多半是跨域（CORS）。本地运行时网站会自动走内置代理 <code>/api/proxy</code>；线上静态托管无法代理，某些服务商的资源链接会加载失败。这种情况建议本地运行使用。</p></details>
           </div>
+        </section>
+
+        <section class="tut-sec" id="tut8">
+          <h3><i>⑧</i>一句话智能生成（新）</h3>
+          <p class="tut-lead">不会写提示词就走这里：一句话 → 选广告类型 → 自动拆卖点 → 自动出图出视频。</p>
+          <ol class="tut-steps">
+            <li>在「一句话智能生成」里写一句产品描述，例如「一款可机洗的羊绒格纹毯，海边野餐用，米白焦糖色」。</li>
+            <li>选广告类型：<b>口播带货 / 创意剧情 / 品牌宣传 / 开箱种草 / 促销转化 / 质感大片</b>，每种类型有不同内置提示词与分镜节奏。</li>
+            <li>点 <b>「🧠 智能拆解卖点」</b>，系统自动列出产品名、卖点、场景、风格、主色、推荐小类，并同步到下方产品信息。</li>
+            <li>点 <b>「🚀 一键生成广告视频」</b>，选 15 秒或 30 秒，整条流程自动跑完；图片在追画区域，视频在视频历史。</li>
+          </ol>
+          <div class="tut-tip">「一句话生图」和「电商详情图」也内置了提示词：写一句话直接出图；详情图会自动留白文字区，避免 AI 写乱码字。</div>
+          <div class="tut-warn">15 秒和 30 秒现在是<b>两个独立视图</b>，各有自己的节奏模板和分段设置。左侧导航或顶部标签切换，界面和参数都不一样。</div>
         </section>
 
       </div>

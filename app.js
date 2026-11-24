@@ -59,6 +59,81 @@
     '口播时长：4.5 字/秒（5s≈22 字、4s≈18 字、3s≈13 字），时长不足就压缩台词。\n' +
     '质检：喷头外露再按压、开盖再挤出；产品相对大小真实；无多余手指/多手；无变形文字。';
 
+  /* ---------- 内置智能模板库：一句话生成 / 生图 / 详情图 ---------- */
+  var SMART_TYPES = {
+    koupai: {
+      name: '口播带货', group: '达人带货', subId: 'LV-01',
+      beats: ['前 1 秒开口抛痛点', '近景讲第一个卖点', '手持展示材质细节', '同框给真实推荐理由'],
+      image: '真人达人对镜头口播的电商主视觉，商品举在镜头前约占画面三分之一，眼神自然看镜头，真实生活场景，柔和窗光，浅景深，画面内不出现任何文字或字幕。',
+      video: 'A-roll 为主：开场即开口，三段口播（钩子 / 卖点证明 / 推荐收尾），按 4.5 字每秒核字数，每段换景别（中景→近景→手持），末尾加「无背景音乐，纯人声」。B-roll 2 条：手部真实使用动作与产品空镜，镜头缓推，末尾加「无背景音乐，纯画面素材」。'
+    },
+    chuangyi: {
+      name: '创意剧情', group: '剧情广告', subId: 'XQ-01',
+      beats: ['强冲突开场，商品已在画内', '人物用商品完成明确动作', '冲突化解，情绪反转', '一句短促有记忆点的收尾'],
+      image: '电影感短剧分镜，人物遇到具体小麻烦，商品作为关键物件已经清楚出现在画面里，冲突感强但表情克制，统一暖调自然光，商品外观与真实相对大小准确，画面内不写任何文字。',
+      video: '三幕反转结构：0-5s 冲突与痛点（画外音垫入），5-11s 用商品完成一个能解释卖点的明确动作，11-15s 状态反转与产品同框定格。A-roll 只在反转处开口，末尾加「无背景音乐，纯人声」；B-roll 写镜头缓推与焦点转移，末尾加「无背景音乐，纯画面素材」。不要让剧情盖过商品。'
+    },
+    xuanchuan: {
+      name: '品牌宣传', group: '品牌大片', subId: 'LV-05',
+      beats: ['大场景建立品牌情绪', '商品英雄镜头入场', '材质微距交代工艺', '正面定格强化品牌气质'],
+      image: '品牌大片主视觉，宏大干净的场景先建立情绪，商品作为绝对视觉中心落在三分法位置，电影级柔光与轮廓光，主色不超过三种，商品外观完整一致，画面内不生成文字或 Logo 字形。',
+      video: '大场景开场建立情绪，镜头缓慢推进；商品以英雄镜头出场，环绕展示完整外观；切材质微距交代工艺与卖点；最后正面定格，光线从右后方打入。全片统一光向色温，无突变转场；末尾加「无背景音乐，纯画面素材」，口播段加「无背景音乐，纯人声」。'
+    },
+    kaixiang: {
+      name: '开箱种草', group: '达人带货', subId: 'LV-02',
+      beats: ['包装占满画面', '打开先露保护层制造期待', '取出主体展示第一眼亮点', '商品包装配件同框'],
+      image: '俯拍或轻微斜俯的开箱主视觉，包装盒占满画面，双手动作真实自然，打开后商品与配件陈列整齐，手部不多指不变形，柔和自然光，画面内不写任何文字。',
+      video: 'A-roll 开场即开口，用一句惊讶式钩子；B-roll 按「包装特写→开盖→取出→同框」顺序，动作轻慢干净，每步只讲一个卖点，手部动作符合包装结构；商品不遮脸不遮挡。末尾加「无背景音乐，纯画面素材」。'
+    },
+    cuxiao: {
+      name: '促销转化', group: '达人带货', subId: 'LV-03',
+      beats: ['点名目标人群与日常痛点', '展示可见卖点证据', '完整使用动作证明', '轻行动号召收尾'],
+      image: '真实生活场景中的商品主视觉，商品置于使用动线中心，卖点证据清楚可见，画面留出后期放活动信息的空白区，柔和电商光，商品外观一致，画面内不出现任何文字、价格或折扣数字。',
+      video: '前 3 秒点名人群与痛点，商品已入画；中段用完整真实使用动作证明卖点，镜头给过程特写；结尾轻 CTA，不喊夸张口号。合规硬规则：不编造价格、折扣、销量、认证与功效承诺，活动信息只来自用户输入。末尾加「无背景音乐，纯人声」。'
+    },
+    zhiliang: {
+      name: '质感大片', group: '品牌大片', subId: 'LV-06',
+      beats: ['氛围空间建立质感', '商品像宝物被发现', '感官细节特写', '正面定格收尾'],
+      image: '电影级质感主视觉，商品被放在画面核心像一件宝物，背景干净有质感，侧逆光勾出轮廓，材质纹理锐利，浅景深，色彩克制统一，画面内不生成任何文字。',
+      video: '慢节奏电影感：空间氛围开场，人物发现并拿起商品，感官细节特写（光泽 / 纹理 / 质地）连续两镜，最后商品正面定格。镜头只做轻微推拉与焦点转移，光线全程统一；口播克制，末尾加「无背景音乐，纯人声」，纯画面段加「无背景音乐，纯画面素材」。'
+    }
+  };
+  var IMAGE_USES = {
+    '主图': '电商主图：商品居中占画面约 60%，主体完整、背景干净、棚拍柔光，商品颜色形状材质与真实商品一致，不生成任何文字。',
+    '海报': '氛围海报：大场景建立情绪，商品作为视觉中心，电影级自然光与轮廓光，上方留白给后期加标题，画面内不写文字。',
+    '社媒': '竖屏社媒封面：上三分之一留白给标题，商品在下半部形成焦点，光线明快，构图简洁，画面内不写文字。',
+    '细节': '材质微距：商品纹理 / 工艺 / 边缘细节锐利可见，侧逆光勾边，浅景深，真实相对大小，不生成文字。'
+  };
+  var DETAIL_USES = {
+    '首屏海报': '详情图首屏：完整商品英雄镜头占画面中心，背景干净高级，商品上方留出标题空白区；所有文案位置只留白，禁止生成任何文字、字母、数字、Logo。',
+    '卖点拆解': '详情图卖点页：一张图 3 个清晰区块，每块用不同机位展示同一个卖点的可见证据（材质 / 使用 / 结果），区块之间留足空白；商品外观全图一致；禁止生成文字与编号。',
+    '细节特写': '详情图质感页：3-4 个局部微距拼合成一张，纹理、走线、边缘、光泽各自锐利，光线方向统一，商品外观一致；禁止生成文字与标注。',
+    '场景氛围': '详情图场景页：商品置于真实使用场景中心，人物只作远景或局部入画，氛围温暖有生活感，商品真实相对大小准确；禁止生成文字。',
+    '促销信息': '详情图信息页：商品靠左下方，右上与中部大面积留白供后期放活动信息，背景简洁不抢主体；严禁生成任何价格、折扣数字、文字或图标。'
+  };
+  var STORY_STRUCTURES = {
+    classic: ['开场大场景建立，镜头缓慢推进，情绪先立住', '产品出场与材质微距特写，一个卖点讲透', '英雄定格，品牌氛围收尾，轻行动号召'],
+    pain: ['痛点共鸣，人物遇到具体难题，商品已入画', '完整使用动作与卖点证据，动作符合商品结构', '结果见证与手持推荐，商品同框定格'],
+    brand: ['世界观铺陈，商品像宝物出现在画面中心', '质感光影与材质微距，全场统一光向色温', '产品英雄正面定格，品牌气质收尾']
+  };
+  var SCENE_HITS = [
+    [/海边|野餐|沙滩/, '海边日落的高端野餐场景'], [/露营|户外|徒步/, '户外露营场景'],
+    [/通勤|上班|办公室/, '通勤与办公场景'], [/睡前|卧室|独处/, '安静的卧室睡前场景'],
+    [/厨房|餐桌|美食/, '明亮整洁的厨房餐桌场景'], [/送礼|礼物|节日/, '节日送礼场景'],
+    [/旅行|出差/, '旅行出行场景'], [/健身|运动|跑步/, '运动训练场景']
+  ];
+  var COLOR_HITS = [
+    [/米白|象牙白/, '米白'], [/焦糖|棕|咖啡/, '焦糖棕'], [/深海蓝|藏蓝/, '深海蓝'],
+    [/曜石黑|黑色/, '曜石黑'], [/纯白|白色/, '纯白'], [/粉色/, '柔粉'],
+    [/绿色/, '草木绿'], [/红色/, '中国红'], [/金色/, '香槟金']
+  ];
+  var AUDIENCE_HITS = [
+    [/闺蜜|朋友/, '闺蜜与好友'], [/妈妈|长辈/, '妈妈与长辈'], [/宝宝|婴儿|母婴/, '宝妈与宝宝'],
+    [/学生|考研/, '学生党'], [/上班族|通勤/, '上班族'], [/老人|爸妈/, '父母长辈']
+  ];
+  var FEATURE_WORDS = ['可机洗', '柔软亲肤', '亲肤', '防水', '防泼水', '轻便', '便携', '速干', '大容量', '长续航', '降噪', '一键操作', '免打孔', '磁吸', '透气', '弹力', '耐磨', '保温', '折叠', '防晒', '静音', '快充', '高清', '迷你', '加厚'];
+  var MATERIAL_WORDS = ['羊绒', '羊毛', '纯棉', '真丝', '亚麻', '皮革', '不锈钢', '玻璃', '硅胶', '竹纤维', '铝合金', '牛皮', '陶瓷'];
+
   var S = {
     cfg: AIHub.loadConfig(),
     imageModel: '',
@@ -70,7 +145,9 @@
     gridRatio: '9:16',
     gridCells: [],
     busy: { prompt: false, image: false, videoPrompt: false, video: false, all: false, grid: false },
-    images: [], videos: []
+    images: [], videos: [],
+    view: 'smart', smartType: 'koupai', smartBd: null,
+    s15Mode: 'single', s15Pace: 'hook', s30Plan: '3x10', s30Story: 'classic'
   };
 
   function readStore(key) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : []; } catch (e) { return []; } }
@@ -90,6 +167,213 @@
       scene: $('#pScene').value.trim(), color: $('#pColor').value.trim(), duration: $('#pDuration').value || '15'
     };
   }
+
+  /* ---------- 一句话智能拆解 + 内置提示词 ---------- */
+  function pickHit(list, text, fallback) {
+    for (var i = 0; i < list.length; i++) if (list[i][0].test(text)) return list[i][1];
+    return fallback;
+  }
+  function localBreakdown(sentence, typeKey) {
+    var s = String(sentence || '').replace(/[；;。！!？?\n]/g, '，').trim();
+    var parts = s.split(/[，,、]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+    var name = parts[0] || s;
+    var prefixes = ['我想', '我要', '需要', '帮我', '推荐', '做一条', '做一个', '一款', '一个', '一套', '一只', '一支', '一瓶', '一盒', '这是', '这', '那', '是'];
+    for (var round = 0; round < 4; round++) {
+      var changed = false;
+      for (var i = 0; i < prefixes.length; i++) {
+        if (name.indexOf(prefixes[i]) === 0) { name = name.slice(prefixes[i].length).trim(); changed = true; break; }
+      }
+      if (!changed) break;
+    }
+    name = name.split(/适合|用于|可以|能够|主要/)[0].trim().slice(0, 26) || s.slice(0, 26);
+    var points = [];
+    FEATURE_WORDS.concat(MATERIAL_WORDS).forEach(function (w) { if (s.indexOf(w) >= 0 && points.indexOf(w) < 0) points.push(w); });
+    parts.slice(1).forEach(function (part) {
+      var t = part.replace(/^(适合|用于|可以|能够|而且|还有|并且|带|有|是|主打)/, '').trim();
+      if (t && t.length <= 24 && points.indexOf(t) < 0 && !/^(的|了|吧|哦|哈)$/.test(t)) points.push(t);
+    });
+    var byType = { koupai: ['真实上手快', '卖点看得见'], chuangyi: ['有记忆点', '场景有反差'], xuanchuan: ['质感统一', '品牌感强'], kaixiang: ['开箱有惊喜', '配件齐全'], cuxiao: ['证据可见', '上手门槛低'], zhiliang: ['材质细节清晰', '光影质感强'] };
+    if (!points.length) points = byType[typeKey] || byType.koupai;
+    points = points.slice(0, 5);
+    var t = SMART_TYPES[typeKey] || SMART_TYPES.koupai;
+    var sub = (window.AdSkills && window.AdSkills.SUBTYPES.filter(function (x) { return x.id === t.subId; })[0]) || { name: t.name, id: t.subId };
+    return {
+      sentence: s, name: name, points: points,
+      scene: pickHit(SCENE_HITS, s, '明亮干净的生活场景'),
+      color: pickHit(COLOR_HITS, s, '米白与暖棕'),
+      audience: pickHit(AUDIENCE_HITS, s, '日常使用者'),
+      style: /电影|大片|高级|质感|氛围/.test(s) ? '电影级电商广告摄影，柔和自然光，暖色调' : '真实生活感电商广告摄影，自然窗光，暖色调',
+      type: typeKey, typeName: t.name, group: t.group, sub: sub.name + '（' + sub.id + '）', hook: t.beats[0]
+    };
+  }
+  function renderBreakdown(bd) {
+    if (!bd) return;
+    $('#smartBreakdown').innerHTML =
+      '<div class="bd-item wide"><span class="bd-label">产品名</span><div class="bd-value">' + esc(bd.name) + '</div></div>' +
+      '<div class="bd-item wide"><span class="bd-label">自动拆解的卖点</span><div class="bd-points">' + bd.points.map(function (x) { return '<span class="bd-point">' + esc(x) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="bd-item"><span class="bd-label">使用场景</span><div class="bd-value">' + esc(bd.scene) + '</div></div>' +
+      '<div class="bd-item"><span class="bd-label">目标人群</span><div class="bd-value">' + esc(bd.audience) + '</div></div>' +
+      '<div class="bd-item"><span class="bd-label">画面风格</span><div class="bd-value">' + esc(bd.style) + '</div></div>' +
+      '<div class="bd-item"><span class="bd-label">主色</span><div class="bd-value">' + esc(bd.color) + '</div></div>' +
+      '<div class="bd-item"><span class="bd-label">广告类型</span><div class="bd-value">' + esc(bd.typeName) + '</div></div>' +
+      '<div class="bd-item"><span class="bd-label">推荐小类</span><div class="bd-value">' + esc(bd.sub) + '</div></div>';
+  }
+  function applyBreakdown(bd) {
+    if (!bd) return;
+    $('#pName').value = bd.name;
+    $('#pSell').value = bd.points.join(', ');
+    $('#pStyle').value = bd.style;
+    $('#pScene').value = bd.scene;
+    $('#pColor').value = bd.color;
+  }
+  function syncBreakdownFromProduct() {
+    var bd = S.smartBd || localBreakdown($('#smartSentence').value, S.smartType);
+    var p = product();
+    if (p.name) bd.name = p.name;
+    if (p.sell) bd.points = p.sell.split(/[,，、]/).map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 5);
+    if (p.style) bd.style = p.style;
+    if (p.scene) bd.scene = p.scene;
+    if (p.color) bd.color = p.color;
+    S.smartBd = bd;
+    return bd;
+  }
+  function extractJson(text) {
+    var s = String(text || '');
+    var a = s.indexOf('{'), b = s.lastIndexOf('}');
+    if (a < 0 || b <= a) return null;
+    try { return JSON.parse(s.slice(a, b + 1)); } catch (e) { return null; }
+  }
+  function buildSmartImagePrompt(bd) {
+    var p = product(), t = SMART_TYPES[S.smartType] || SMART_TYPES.koupai;
+    var ratio = $('#smartRatio').value || '9:16';
+    return [
+      '【一句话需求】' + bd.sentence,
+      '【广告类型】' + t.name + '（' + t.group + ' · ' + bd.sub + '）',
+      '【产品档案】产品名：' + p.name + '；卖点：' + p.sell + '；主色：' + p.color + '；受众：' + bd.audience,
+      '【内置画面模板】' + t.image,
+      '【场景与风格】' + p.scene + '；' + p.style,
+      '【镜头节奏】' + t.beats.map(function (x, i) { return (i + 1) + '. ' + x; }).join(' → '),
+      '【核心逻辑】叙事与重构：大场景建立情绪 → 趋势递进到产品 → 微观特写交代材质 → 英雄终镜定格完整产品。',
+      '【硬规则】一条广告只讲 1 个主卖点；全场统一光向与色温，主色不超过三种；商品外观、颜色、材质、包装全片一致；真实相对大小；每镜独立成帧；禁止画面内任何文字、Logo 字形或水印。',
+      '【输出要求】' + ratio + ' 画幅，主体遵循三分法，逐镜描述机位、光线、主体位置与材质细节。'
+    ].join('\n');
+  }
+  function buildSmartVideoPrompt(bd) {
+    var p = product(), t = SMART_TYPES[S.smartType] || SMART_TYPES.koupai;
+    var secs = Number($('#smartDuration').value) || 15;
+    var maxWords = Math.round(secs * 4.5);
+    var first = bd.points[0] || p.sell;
+    return [
+      'Role: 高端电商广告导演。广告类型：' + t.name + '；生产大类：' + t.group + '；正式小类：' + bd.sub + '。',
+      'Task: 为「' + p.name + '」生成 ' + secs + ' 秒广告视频。卖点：' + p.sell + '。场景：' + p.scene + '。',
+      '【内置视频模板】' + t.video,
+      '【镜头节奏】' + t.beats.map(function (x, i) { return (i + 1) + '. ' + x; }).join(' → '),
+      'A-roll 口播（总时长 ' + secs + ' 秒，台词合计不超过 ' + maxWords + ' 字）：',
+      '  1. 中景·钩子：' + bd.hook,
+      '  2. 近景·卖点：' + p.name + '，' + first + '，这里直接展示给你看。',
+      '  3. 手持推荐：适合' + bd.audience + '日常使用，喜欢可以看看这一款。',
+      'B-roll 辅助镜头（每条只写画面怎么动，至少 1 条产品空镜）：',
+      '  1. 首帧：痛点分镜图。画面：人物表情克制，镜头缓慢推近。',
+      '  2. 首帧：使用分镜图。画面：手部真实使用动作，焦点落到' + first + '的细节。',
+      '  3. 首帧：产品空镜。画面：' + p.name + '静置在' + p.scene + '，镜头缓慢环绕，光线流转。',
+      'Constraints: 商品外观与真实相对大小全片一致；不生成画面文字；无镜头突变、无主体变形、无多余手指；' + VIDEO_STRATEGY.slice(0, 300)
+    ].join('\n');
+  }
+  function setSmartPrompts(bd) {
+    bd = syncBreakdownFromProduct();
+    renderBreakdown(bd);
+    $('#imagePrompt').value = buildSmartImagePrompt(bd);
+    $('#videoPrompt').value = buildSmartVideoPrompt(bd);
+    $('#videoGenPrompt').value = $('#videoPrompt').value;
+    syncPromptCounts();
+    var t = SMART_TYPES[S.smartType] || SMART_TYPES.koupai;
+    $('#strategyPreview').textContent = '【已选广告类型】' + t.name + ' · ' + t.group + ' · ' + bd.sub + '\n' + t.beats.join(' → ');
+  }
+  function runSmartAnalyze() {
+    var s = $('#smartSentence').value.trim();
+    if (!s) { toast('先写一句话产品描述', 'err'); return; }
+    var bd = localBreakdown(s, S.smartType);
+    S.smartBd = bd; renderBreakdown(bd); applyBreakdown(bd);
+    setStatus('#statusSmart', '已拆解（内置规则）');
+    if (textConfigured()) {
+      setStatus('#statusSmart', '模型润色中…', 'busy');
+      AIHub.callText({
+        system: '你是电商广告卖点分析师。只输出 JSON，不要解释、不要 Markdown。字段：name(产品名), points(3-5个卖点数组), scene(使用场景), color(主色), audience(目标人群), style(画面风格)。不编造材质功效价格。',
+        prompt: '一句话需求：' + s
+      }).then(function (text) {
+        var j = extractJson(text);
+        if (!j) return;
+        if (j.name) bd.name = String(j.name).slice(0, 30);
+        if (Array.isArray(j.points) && j.points.length) bd.points = j.points.map(String).slice(0, 5);
+        ['scene', 'color', 'audience', 'style'].forEach(function (k) { if (j[k]) bd[k] = String(j[k]).slice(0, 60); });
+        S.smartBd = bd; renderBreakdown(bd); applyBreakdown(bd);
+        setStatus('#statusSmart', '已由文本模型润色');
+      }).catch(function () { setStatus('#statusSmart', '已拆解（内置规则）'); });
+    }
+  }
+  function runSmartPrompts() {
+    var s = $('#smartSentence').value.trim();
+    if (!s && !S.smartBd) { toast('先写一句话并点「智能拆解卖点」', 'err'); return; }
+    var bd = S.smartBd || localBreakdown(s, S.smartType);
+    S.smartBd = bd;
+    setSmartPrompts(bd);
+    toast('已生成「' + bd.typeName + '」内置提示词，可在下方预览里手改', 'ok');
+  }
+  function runSmartAll() {
+    var s = $('#smartSentence').value.trim();
+    if (!s) { toast('先写一句话产品描述', 'err'); return; }
+    var bd = localBreakdown(s, S.smartType);
+    S.smartBd = bd; renderBreakdown(bd); applyBreakdown(bd); setSmartPrompts(bd);
+    S.ratio = $('#smartRatio').value || '9:16';
+    $$('#ratioRow .chip').forEach(function (c) { c.classList.toggle('active', c.dataset.ratio === S.ratio); });
+    $('#pDuration').value = $('#smartDuration').value;
+    if ($('#smartDuration').value === '30') run30({ keepPrompts: true });
+    else run15({ keepPrompts: true });
+  }
+  function oneLinePrompt() {
+    var s = $('#oneImgSentence').value.trim() || $('#pName').value.trim();
+    if (!s) return '';
+    var style = ($('#oneImgStyleRow .chip.active') || {}).dataset ? $('#oneImgStyleRow .chip.active').dataset.style : '主图';
+    var p = product();
+    return [
+      '【画面用途】' + style + '：' + (IMAGE_USES[style] || IMAGE_USES['主图']),
+      '【一句话需求】' + s,
+      '【产品信息】' + (p.name || s) + '；卖点：' + (p.sell || '突出主体质感') + '；主色：' + (p.color || '暖色调'),
+      '【内置画面规则】' + IMAGE_STRATEGY.slice(0, 500),
+      '【输出要求】' + ($('#oneImgRatio').value || '3:4') + ' 画幅，主体清晰，商品外观与真实相对大小一致，不生成任何文字。'
+    ].join('\n');
+  }
+  function detailPrompt() {
+    var s = $('#detailSentence').value.trim() || $('#pName').value.trim();
+    if (!s) return '';
+    var kind = $('#detailTypeRow .chip.active') ? $('#detailTypeRow .chip.active').dataset.detail : '首屏海报';
+    var p = product();
+    return [
+      '【详情图类型】' + kind,
+      '【版式模板】' + (DETAIL_USES[kind] || DETAIL_USES['首屏海报']),
+      '【一句话产品】' + s,
+      '【产品档案】' + (p.name || s) + '；卖点：' + (p.sell || s) + '；主色：' + (p.color || '与品牌色一致'),
+      '【通用规则】电商详情图 3:4 竖版，专业商品摄影，统一光线方向，商品外观 / 颜色 / 材质 / 包装全图一致；文字一律留白由后期叠加，禁止生成任何可识别文字与数字。',
+      '【质检】无多余手指、无多手多臂、无肢体变形、无乱码字形、无穿模。'
+    ].join('\n');
+  }
+  function runOneImage(onlyPrompt) {
+    var prompt = oneLinePrompt();
+    if (!prompt) { toast('先写一句话画面需求', 'err'); return; }
+    $('#imagePrompt').value = prompt; syncPromptCounts();
+    if (onlyPrompt) { toast('一句话生图提示词已生成，可到下方提示词预览手改', 'ok'); return; }
+    generateImages(true, { prompt: prompt, ratio: $('#oneImgRatio').value, count: Number($('#oneImgCount').value) || 1 })
+      .then(function (urls) { toast(urls.length ? '已生成 ' + urls.length + ' 张图片，见下方追画区域' : '图片未生成，请检查图片接口设置', urls.length ? 'ok' : 'err'); });
+  }
+  function runDetailImage(onlyPrompt) {
+    var prompt = detailPrompt();
+    if (!prompt) { toast('先写一句话产品描述', 'err'); return; }
+    $('#imagePrompt').value = prompt; syncPromptCounts();
+    if (onlyPrompt) { toast('详情图提示词已生成，可到下方提示词预览手改', 'ok'); return; }
+    generateImages(true, { prompt: prompt, ratio: '3:4', count: 1, tag: '电商详情图' })
+      .then(function (urls) { toast(urls.length ? '详情图已生成，见下方追画区域' : '详情图未生成，请检查图片接口设置', urls.length ? 'ok' : 'err'); });
+  }
+
   function buildImagePromptLocal() {
     var p = product();
     var sk = window.AdSkills;
@@ -515,7 +799,12 @@
   }
   function textConfigured() { return !!(S.cfg.text.apiKey || /^https?:\/\//i.test(S.cfg.text.path)); }
 
-  function generateImagePrompt() {
+  function generateImagePrompt(opts) {
+    opts = opts || {};
+    if (opts.keepPrompts && $('#imagePrompt').value.trim()) {
+      setStatus('#statusPrompt', '已生成（智能模板）');
+      return Promise.resolve($('#imagePrompt').value.trim());
+    }
     if (S.busy.prompt) return Promise.resolve(null);
     setBusy('prompt', true);
     var task = textConfigured()
@@ -536,7 +825,12 @@
     });
   }
 
-  function generateVideoPrompt() {
+  function generateVideoPrompt(opts) {
+    opts = opts || {};
+    if (opts.keepPrompts && $('#videoPrompt').value.trim()) {
+      setStatus('#statusVideoPrompt', '已生成（智能模板）');
+      return Promise.resolve($('#videoPrompt').value.trim());
+    }
     if (S.busy.videoPrompt) return Promise.resolve(null);
     setBusy('videoPrompt', true);
     var task = textConfigured()
@@ -559,16 +853,18 @@
     });
   }
 
-  function generateImages(silent) {
+  function generateImages(silent, opts) {
+    opts = opts || {};
     if (S.busy.image) return Promise.resolve([]);
-    var prompt = $('#imagePrompt').value.trim();
+    var prompt = opts.prompt || $('#imagePrompt').value.trim();
     if (!prompt) { toast('请先生成或填写提示词', 'err'); return Promise.resolve([]); }
     var missing = AIHub.validate('image');
     if (missing.length) { toast('图片接口未配置完整：' + missing.join('、') + '。请在设置中填写。', 'err'); if (!silent) openSettings('image'); return Promise.resolve([]); }
     setBusy('image', true);
-    var count = Number($('#imageCount').value) || 1;
-    var level = $('#imageSize').value;
-    var size = computeSize(S.ratio, level);
+    var count = Number(opts.count || $('#imageCount').value) || 1;
+    var level = opts.sizeLevel || $('#imageSize').value;
+    var ratio = opts.ratio || S.ratio;
+    var size = computeSize(ratio, level);
     var channelName = channel('image');
     var model = S.imageModel || S.cfg.image.model;
     var chain = Promise.resolve([]);
@@ -576,12 +872,12 @@
       (function (idx) {
         chain = chain.then(function (acc) {
           var t0 = Date.now();
-          return AIHub.callImage({ prompt: prompt, n: 1, size: size, ratio: S.ratio, model: S.imageModel || undefined })
+          return AIHub.callImage({ prompt: prompt, n: 1, size: size, ratio: ratio, model: opts.model || S.imageModel || undefined })
             .then(function (res) {
               res.urls.forEach(function (u) {
                 addHistory('image', {
                   id: uid() + '-' + idx, status: 'ok', time: now(), elapsed: ((Date.now() - t0) / 1000).toFixed(1) + 's',
-                  channel: channelName, model: model, ratio: S.ratio, resolution: level + ' · ' + size,
+                  channel: channelName, model: (opts.tag ? opts.tag + ' · ' : '') + model, ratio: ratio, resolution: level + ' · ' + size,
                   prompt: prompt, url: u
                 });
               });
@@ -590,7 +886,7 @@
             }).catch(function (e) {
               addHistory('image', {
                 id: uid() + '-' + idx, status: 'error', time: now(), elapsed: ((Date.now() - t0) / 1000).toFixed(1) + 's',
-                channel: channelName, model: model, ratio: S.ratio, resolution: level, prompt: prompt, url: '', error: e.message
+                channel: channelName, model: (opts.tag ? opts.tag + ' · ' : '') + model, ratio: ratio, resolution: level, prompt: prompt, url: '', error: e.message
               });
               if (!silent) toast('图片生成失败：' + e.message, 'err');
               return acc;
@@ -718,23 +1014,93 @@
       : '已填入国内 Agnes 配置：文本 / 图片 / 视频', 'ok');
   }
 
-  function run30() {
+  function lockFlowButtons(locked) {
+    ['#btnAll', '#btnRun15', '#btnAll30', '#btnRun30'].forEach(function (id) { var el = $(id); if (el) el.disabled = locked; });
+  }
+  function run15(opts) {
+    opts = opts || {};
     if (S.busy.all) return;
     S.busy.all = true;
-    $('#btnAll30').disabled = true; $('#btnAll').disabled = true;
-    var segCount = 3, segSeconds = 10;
+    lockFlowButtons(true);
+    var segs = S.s15Mode === 'two' ? [8, 7] : [12];
+    var paces = {
+      hook: '钩子先行：前 1 秒直接抛痛点或结果，随后一个卖点证明，最后给行动号召。',
+      story: '反转小剧情：冲突出现 → 拿起商品完成动作 → 状态反转 → 产品定格。',
+      hero: '产品英雄：大场景建立情绪 → 材质微距 → 完整产品正面定格。'
+    };
     var oldCount = $('#imageCount').value;
     $('#imageCount').value = '1';
     function finish(msg, ok) {
       $('#imageCount').value = oldCount;
       S.busy.all = false;
-      $('#btnAll30').disabled = false; $('#btnAll').disabled = false;
+      lockFlowButtons(false);
+      progress(100, ok ? '15S 广告已完成' : '15S 流程结束');
+      toast(msg, ok ? 'ok' : 'err');
+    }
+    progress(5, '1/5 生成 15S 叙事提示词…');
+    var gridRef = null;
+    generateImagePrompt(opts).then(function () {
+      progress(20, '2/5 生成 15S 分镜宫格图…');
+      return generateStoryboard(true);
+    }).then(function (grid) {
+      gridRef = grid && grid.url ? grid.url : null;
+      progress(38, '3/5 生成 15S 主视觉图…');
+      return generateImages(true);
+    }).then(function () {
+      progress(56, '4/5 生成 15S 视频提示词…');
+      return generateVideoPrompt(opts);
+    }).then(function () {
+      var base = $('#videoPrompt').value.trim() + '\n\n【15 秒专属节奏】' + paces[S.s15Pace];
+      $('#videoGenPrompt').value = base;
+      var urls = [], chain = Promise.resolve();
+      for (var i = 0; i < segs.length; i++) {
+        (function (idx) {
+          chain = chain.then(function () {
+            progress(64 + idx * 10, '5/5 生成第 ' + (idx + 1) + '/' + segs.length + ' 段（' + segs[idx] + ' 秒）…');
+            var p = base + (segs.length > 1 ? '\n【15 秒广告分段 ' + (idx + 1) + '/' + segs.length + '，本段 ' + segs[idx] + ' 秒；画面任务：' + paces[S.s15Pace] + '】' : '');
+            return generateVideo(true, {
+              prompt: p, duration: segs[idx], tag: '15S片段' + (idx + 1),
+              refMode: gridRef ? 'reference' : 'text', imageUrl: gridRef
+            });
+          }).then(function (res) { if (res && res.url) urls.push({ i: idx, url: res.url }); });
+        })(i);
+      }
+      return chain.then(function () { return urls; });
+    }).then(function (urls) {
+      if (urls.length < segs.length) { finish('仅生成 ' + urls.length + '/' + segs.length + ' 段 15S 视频，请查看视频历史', false); return; }
+      if (segs.length === 1) { finish('15 秒广告已生成（单段 12s）', true); return; }
+      progress(88, '5/5 本地拼接 15 秒成片…');
+      urls.sort(function (a, b) { return a.i - b.i; });
+      return AIHub.mergeVideos(urls.map(function (u) { return u.url; }), '15s-ad').then(function (res) {
+        addHistory('video', {
+          id: uid(), status: 'ok', time: now(), elapsed: '本地拼接', channel: 'ffmpeg 拼接',
+          model: '15S 成片（' + segs.join('s+') + 's）', ratio: S.ratio, resolution: '720P',
+          prompt: $('#videoPrompt').value.trim().slice(0, 600), url: res.url
+        });
+        finish('15 秒广告已生成并拼接完成', true);
+      }).catch(function (e) { finish('两段视频已生成，但拼接失败：' + e.message, false); });
+    }).catch(function (e) { finish('15S 流程中断：' + e.message, false); });
+  }
+
+  function run30(opts) {
+    opts = opts || {};
+    if (S.busy.all) return;
+    S.busy.all = true;
+    lockFlowButtons(true);
+    var segs = S.s30Plan === '2x12' ? [12, 12, 6] : [10, 10, 10];
+    var phases = STORY_STRUCTURES[S.s30Story] || STORY_STRUCTURES.classic;
+    var oldCount = $('#imageCount').value;
+    $('#imageCount').value = '1';
+    function finish(msg, ok) {
+      $('#imageCount').value = oldCount;
+      S.busy.all = false;
+      lockFlowButtons(false);
       progress(100, ok ? '30S 广告已完成' : '流程结束');
       toast(msg, ok ? 'ok' : 'err');
     }
     progress(4, '1/6 生成 30 秒广告叙事提示词…');
     var gridRef = null;
-    generateImagePrompt().then(function () {
+    generateImagePrompt(opts).then(function () {
       progress(12, '2/6 生成分镜宫格图…');
       return generateStoryboard(true);
     }).then(function (grid) {
@@ -743,18 +1109,18 @@
       return generateImages(true);
     }).then(function () {
       progress(28, '4/6 生成视频提示词…');
-      return generateVideoPrompt();
+      return generateVideoPrompt(opts);
     }).then(function () {
-      var basePrompt = $('#videoPrompt').value.trim();
-      var phases = ['开场大场景建立，镜头缓慢推进', '产品出场与材质微距特写', '英雄定格，品牌氛围收尾'];
+      var basePrompt = $('#videoPrompt').value.trim() + '\n\n【30 秒叙事结构】' + phases.join(' → ');
+      $('#videoGenPrompt').value = basePrompt;
       var urls = [], chain = Promise.resolve();
-      for (var i = 0; i < segCount; i++) {
+      for (var i = 0; i < segs.length; i++) {
         (function (idx) {
           chain = chain.then(function () {
-            progress(34 + idx * 16, '5/6 生成第 ' + (idx + 1) + '/' + segCount + ' 段（10 秒）…');
-            var segPrompt = basePrompt + '\n\n【30 秒广告分段 ' + (idx + 1) + '/' + segCount + '，本段 10 秒；画面任务：' + phases[idx] + '；镜头与产品保持一致】';
+            progress(34 + idx * 16, '5/6 生成第 ' + (idx + 1) + '/' + segs.length + ' 段（' + segs[idx] + ' 秒）…');
+            var segPrompt = basePrompt + '\n\n【30 秒广告分段 ' + (idx + 1) + '/' + segs.length + '，本段 ' + segs[idx] + ' 秒；画面任务：' + phases[idx] + '；镜头与产品保持一致，其余两段不要混入本段】';
             return generateVideo(true, {
-              prompt: segPrompt, duration: segSeconds, tag: '30S片段' + (idx + 1),
+              prompt: segPrompt, duration: segs[idx], tag: '30S片段' + (idx + 1),
               refMode: gridRef ? 'reference' : 'text', imageUrl: gridRef,
               onProgress: function (msg) { progress(34 + idx * 16, '5/6 第' + (idx + 1) + '段：' + String(msg).slice(0, 38)); }
             });
@@ -763,18 +1129,30 @@
       }
       return chain.then(function () { return urls; });
     }).then(function (urls) {
-      if (urls.length < segCount) { finish('仅生成 ' + urls.length + '/' + segCount + ' 段视频，未执行合并，请查看视频历史', false); return; }
+      if (urls.length < segs.length) { finish('仅生成 ' + urls.length + '/' + segs.length + ' 段视频，未执行合并，请查看视频历史', false); return; }
       progress(88, '6/6 本地合并 30 秒成片…');
       urls.sort(function (a, b) { return a.i - b.i; });
       return AIHub.mergeVideos(urls.map(function (u) { return u.url; }), '30s-ad').then(function (res) {
         addHistory('video', {
           id: uid(), status: 'ok', time: now(), elapsed: '本地合并', channel: 'ffmpeg 拼接',
-          model: '30S 成片（' + segCount + '×10s）', ratio: S.ratio, resolution: '720P',
+          model: '30S 成片（' + segs.join('s+') + 's）', ratio: S.ratio, resolution: '720P',
           prompt: $('#videoPrompt').value.trim().slice(0, 600), url: res.url
         });
         finish('30 秒广告已生成并合并完成', true);
       }).catch(function (e) { finish('三段视频已生成，但合并失败：' + e.message, false); });
     }).catch(function (e) { finish('30S 流程中断：' + e.message, false); });
+  }
+
+  /* ---------- 视图切换 ---------- */
+  function switchView(v) {
+    if (['smart', 's15', 's30'].indexOf(v) < 0) v = 'smart';
+    S.view = v;
+    ['smart', 's15', 's30'].forEach(function (k) { var el = $('#view-' + k); if (el) el.hidden = (k !== v); });
+    $$('#viewTabs .view-tab').forEach(function (b) { b.classList.toggle('active', b.dataset.view === v); });
+    $$('.nav-item[data-view]').forEach(function (b) { b.classList.toggle('nav-active', b.dataset.view === v); });
+    $('#topTitle').textContent = ({ smart: '一句话生成广告视频', s15: '15 秒广告', s30: '30 秒广告' })[v];
+    try { localStorage.setItem('ai_studio_view', v); } catch (e) {}
+    var ws = $('#top'); if (ws) ws.scrollTop = 0;
   }
 
   /* ---------- 事件绑定 ---------- */
@@ -785,6 +1163,8 @@
         if (t === 'settings') { openSettings(); return; }
         var el = document.getElementById(t);
         if (el) {
+          var panel = el.closest('.view-panel');
+          if (panel && panel.hidden) switchView(panel.id.replace('view-', ''));
           el.scrollIntoView({ behavior: 'smooth', block: 'start' });
           el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
           setTimeout(function () { el.classList.remove('flash'); }, 1200);
@@ -793,7 +1173,14 @@
     });
     $('#btnSettings').addEventListener('click', function () { openSettings(); });
     $('#btnAgnesSetup').addEventListener('click', function () { applyAgnesConfig(); });
-    $('#btnAll30').addEventListener('click', run30);
+    $$('#viewTabs .view-tab').forEach(function (b) {
+      b.addEventListener('click', function () { switchView(this.dataset.view); });
+    });
+    $$('.nav-item[data-view]').forEach(function (b) {
+      b.addEventListener('click', function () { switchView(this.dataset.view); });
+    });
+    $('#btnAll30').addEventListener('click', function () { run30(); });
+    $('#btnRun30').addEventListener('click', function () { run30(); });
     $('#btnCloseSettings').addEventListener('click', closeSettings);
     $('#settingsOverlay').addEventListener('click', function (e) { if (e.target === this) closeSettings(); });
     $$('#settingsTabs .tab').forEach(function (t) {
@@ -826,7 +1213,47 @@
       S.gridRatio = c.dataset.ratio;
     });
     $('#btnGenVideo').addEventListener('click', function () { generateVideo(false); });
-    $('#btnAll').addEventListener('click', runAll);
+    $('#btnAll').addEventListener('click', function () { run15(); });
+    $('#btnRun15').addEventListener('click', function () { run15(); });
+
+    /* 智能视图事件 */
+    $('#btnSmartAnalyze').addEventListener('click', runSmartAnalyze);
+    $('#btnSmartPrompts').addEventListener('click', runSmartPrompts);
+    $('#btnSmartAll').addEventListener('click', runSmartAll);
+    $('#btnOneImg').addEventListener('click', function () { runOneImage(false); });
+    $('#btnOneImgPrompt').addEventListener('click', function () { runOneImage(true); });
+    $('#btnDetailImg').addEventListener('click', function () { runDetailImage(false); });
+    $('#btnDetailPrompt').addEventListener('click', function () { runDetailImage(true); });
+
+    function bindChips(row, onPick) {
+      if (!row) return;
+      row.addEventListener('click', function (e) {
+        var c = e.target.closest('.chip');
+        if (!c || !row.contains(c)) return;
+        $$('.chip', row).forEach(function (x) { x.classList.remove('active'); });
+        c.classList.add('active');
+        onPick(c);
+      });
+    }
+    bindChips($('#smartTypeRow'), function (c) {
+      S.smartType = c.dataset.type;
+      if (S.smartBd) {
+        var t = SMART_TYPES[S.smartType];
+        S.smartBd.type = S.smartType;
+        S.smartBd.typeName = t.name;
+        S.smartBd.group = t.group;
+        var sub = (window.AdSkills && window.AdSkills.SUBTYPES.filter(function (x) { return x.id === t.subId; })[0]) || { name: t.name, id: t.subId };
+        S.smartBd.sub = sub.name + '（' + sub.id + '）';
+        S.smartBd.hook = t.beats[0];
+        setSmartPrompts(S.smartBd);
+      }
+    });
+    bindChips($('#oneImgStyleRow'), function () {});
+    bindChips($('#detailTypeRow'), function () {});
+    bindChips($('#s15ModeRow'), function (c) { S.s15Mode = c.dataset.mode; });
+    bindChips($('#s15PaceRow'), function (c) { S.s15Pace = c.dataset.pace; });
+    bindChips($('#s30PlanRow'), function (c) { S.s30Plan = c.dataset.plan; });
+    bindChips($('#s30StoryRow'), function (c) { S.s30Story = c.dataset.story; });
 
     $('#imageModels').addEventListener('click', function (e) {
       var c = e.target.closest('.chip'); if (!c) return;
@@ -891,4 +1318,7 @@
   renderHistory();
   bind();
   initTutorial();
+  var savedView = 'smart';
+  try { savedView = localStorage.getItem('ai_studio_view') || 'smart'; } catch (e) {}
+  switchView(savedView);
 })();

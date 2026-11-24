@@ -247,3 +247,40 @@ textarea.prompt-area{line-height:1.7;font-size:11.5px;min-height:120px}
 @media(max-width:1280px){.work-grid{grid-template-columns:repeat(2,minmax(320px,1fr))}}
 @media(max-width:900px){.sidebar{width:64px;flex-basis:64px;padding:12px 6px}.brand-name,.brand-sub,.nav-group-title,.nav-item:not(.accent),.sidebar-foot .conn-text,.sidebar-foot .mini-btn{display:none}.nav-item{justify-content:center;padding:10px 0}.nav-item.accent{font-size:0}.nav-item.accent .nav-ico{font-size:16px}.work-grid{grid-template-columns:1fr}.hero{flex-direction:column;align-items:flex-start}.hero-actions{align-items:flex-start}}
 @media(max-width:620px){.form-grid,.cfg-grid,.row-2{grid-template-columns:1fr}.workspace{padding:12px}}
+
+/* ---------- 视图切换（15S / 30S / 一句话） ---------- */
+.viewbar{flex:0 0 auto;border-bottom:1px solid var(--border);padding:10px 22px;background:rgba(14,18,32,.78);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.view-tabs{display:flex;gap:6px;background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:4px}
+.view-tab{border:0;background:transparent;color:var(--muted);border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;transition:.15s;white-space:nowrap}
+.view-tab:hover{color:#fff;background:var(--panel3)}
+.view-tab.active{background:var(--grad);color:#fff;box-shadow:0 4px 14px rgba(139,107,255,.28)}
+.tab-new{font-size:9px;background:rgba(255,255,255,.22);border-radius:6px;padding:1px 5px;margin-left:4px;vertical-align:1px}
+.global-progress{margin-top:0;flex:1;min-width:220px;max-width:520px}
+.global-hint{margin-left:auto;white-space:nowrap}
+.nav-item.nav-active{background:rgba(139,107,255,.18);color:#fff}
+.nav-smart{background:linear-gradient(100deg,rgba(55,211,160,.16),rgba(139,107,255,.16));border-color:rgba(55,211,160,.3)}
+.view-panel{animation:viewin .22s ease}
+@keyframes viewin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.hero-smart{border-color:rgba(55,211,160,.34);background:linear-gradient(150deg,rgba(24,42,45,.9),rgba(16,21,35,.95))}
+.hero-smart .hero-badge{background:rgba(55,211,160,.12);border-color:rgba(55,211,160,.36);color:#a8eccf}
+.hero-30{border-color:rgba(255,79,163,.34);background:linear-gradient(150deg,rgba(44,22,44,.9),rgba(16,21,35,.95))}
+.hero-30 .hero-badge{background:rgba(255,79,163,.12);border-color:rgba(255,79,163,.36);color:#ffb7d9}
+.work-grid-smart{grid-template-columns:repeat(2,minmax(360px,1fr))}
+.config-card{margin-bottom:18px}
+.config-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.config-cols .chip-row{margin-bottom:6px}
+.merge-note{background:rgba(255,207,107,.08);border:1px solid rgba(255,207,107,.28);color:#f5dc9e;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.7;margin:12px 0}
+.merge-note code{font-family:Consolas,monospace;color:#ffe9b8}
+.shared-divider{display:flex;align-items:center;gap:12px;padding:11px 16px;margin-bottom:16px;border-style:dashed;color:var(--muted);font-size:11.5px}
+.shared-divider b{color:#d9cfff;font-size:12.5px}
+.full-mini{width:100%;margin-top:8px;text-align:center}
+.breakdown-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+.bd-item{background:rgba(255,255,255,.028);border:1px solid var(--border);border-radius:9px;padding:9px 11px;min-width:0}
+.bd-item.wide{grid-column:1/-1}
+.bd-label{display:block;font-size:10.5px;color:var(--muted2);letter-spacing:.5px;margin-bottom:4px}
+.bd-value{font-size:12.5px;color:#e4e9f6;line-height:1.6;word-break:break-all}
+.bd-points{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px}
+.bd-point{background:rgba(139,107,255,.14);border:1px solid rgba(139,107,255,.3);color:#d4c8ff;border-radius:6px;padding:2px 7px;font-size:11.5px}
+@media(max-width:1280px){.work-grid-smart{grid-template-columns:repeat(2,minmax(320px,1fr))}.global-hint{display:none}}
+@media(max-width:900px){.viewbar{padding:8px 12px}.view-tabs{width:100%;overflow-x:auto}.config-cols{grid-template-columns:1fr}}
+@media(max-width:620px){.work-grid-smart{grid-template-columns:1fr}.breakdown-grid{grid-template-columns:1fr}}
