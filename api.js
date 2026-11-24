@@ -48,10 +48,7 @@
       pollMs: 4000,
       timeout: 600000
     },
-    general: {
-      proxyEnabled: false,
-      proxyUrl: 'http://127.0.0.1:8787/api/proxy'
-    }
+    general: {}
   };
 
   var PRESETS = {
@@ -287,27 +284,16 @@
   }
 
   function request(url, method, headers, body, timeout) {
-    var general = loadConfig().general;
+    // 全在线直连：不依赖任何本地服务或代理。
     var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = controller ? setTimeout(function () { controller.abort(); }, timeout || 120000) : null;
-    var opts, target = url;
-    if (general.proxyEnabled && general.proxyUrl) {
-      target = general.proxyUrl;
-      opts = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url, method: method, headers: headers, body: body || null }),
-        signal: controller ? controller.signal : undefined
-      };
-    } else {
-      opts = {
-        method: method,
-        headers: headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
-        signal: controller ? controller.signal : undefined
-      };
-    }
-    return fetch(target, opts).then(function (resp) {
+    var opts = {
+      method: method,
+      headers: headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: controller ? controller.signal : undefined
+    };
+    return fetch(url, opts).then(function (resp) {
       if (timer) clearTimeout(timer);
       return resp.text().then(function (text) {
         var data;
@@ -325,7 +311,7 @@
       if (timer) clearTimeout(timer);
       if (e.name === 'AbortError') throw new Error('请求超时（' + ((timeout || 120000) / 1000) + ' 秒），请检查接口响应速度或调大超时时间。');
       if (e.message && /Failed to fetch|NetworkError|Load failed/i.test(e.message)) {
-        throw new Error('网络请求失败：可能是跨域(CORS)限制、接口地址不可达或密钥错误。可在「设置 → 通用」开启本地代理，并运行 node server.js。原始信息：' + e.message);
+        throw new Error('网络请求失败：请检查接口地址是否支持浏览器直连（CORS）、密钥是否正确。本站全在线运行，不需要本地服务。原始信息：' + e.message);
       }
       throw e;
     });
@@ -434,22 +420,6 @@
     });
   }
 
-  function mergeVideos(urls, name) {
-    return fetch('/api/merge-videos', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ urls: urls, name: name || 'ad-30s' })
-    }).then(function (resp) {
-      return resp.text().then(function (text) {
-        var data; try { data = JSON.parse(text); } catch (e) { data = text; }
-        if (!resp.ok) throw new Error((data && data.error) || ('合并请求失败 HTTP ' + resp.status));
-        return data;
-      });
-    }).catch(function (e) {
-      if (/Failed to fetch|NetworkError/i.test(e.message)) throw new Error('无法调用本地视频合并服务。请运行 node server.js 并通过 http://127.0.0.1:8787 访问页面。');
-      throw e;
-    });
-  }
-
   function validate(kind) {
     var c = loadConfig()[kind];
     var missing = [];
@@ -465,7 +435,7 @@
   global.AIHub = {
     DEFAULT_CONFIG: DEFAULT_CONFIG, PRESETS: PRESETS,
     loadConfig: loadConfig, saveConfig: saveConfig, resetConfig: resetConfig, applyPreset: applyPreset,
-    callText: callText, callImage: callImage, callVideo: callVideo, mergeVideos: mergeVideos,
+    callText: callText, callImage: callImage, callVideo: callVideo,
     validate: validate, testText: testText
   };
 })(window);

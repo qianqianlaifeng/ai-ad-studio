@@ -276,7 +276,9 @@
       '  1. 首帧：痛点分镜图。画面：人物表情克制，镜头缓慢推近。',
       '  2. 首帧：使用分镜图。画面：手部真实使用动作，焦点落到' + first + '的细节。',
       '  3. 首帧：产品空镜。画面：' + p.name + '静置在' + p.scene + '，镜头缓慢环绕，光线流转。',
-      'Constraints: 商品外观与真实相对大小全片一致；不生成画面文字；无镜头突变、无主体变形、无多余手指；' + VIDEO_STRATEGY.slice(0, 300)
+      '【时间线分镜 · 单条直出】' + buildTimeline(secs, t.beats.slice(0, 3)).replace(/\n/g, ' / '),
+      'Constraints: 商品外观与真实相对大小全片一致；台词按 4.5 字每秒核算，时长不足先压缩台词；A-roll 末尾加「无背景音乐，纯人声」，B-roll 末尾加「无背景音乐，纯画面素材」；不生成画面文字、字幕、水印。',
+      qualityTail(secs).trim()
     ].join('\n');
   }
   function setSmartPrompts(bd) {
@@ -580,10 +582,7 @@
       { k: 'pollMs', label: '轮询间隔（毫秒）', type: 'number' },
       { k: 'timeout', label: '最大等待（毫秒）', type: 'number' }
     ],
-    general: [
-      { k: 'proxyEnabled', label: '启用本地代理转发（解决跨域 CORS）', type: 'bool', wide: true },
-      { k: 'proxyUrl', label: '本地代理地址', placeholder: 'http://127.0.0.1:8787/api/proxy', wide: true }
-    ]
+    general: []
   };
 
   var draft = null;
@@ -598,7 +597,7 @@
       html += '<div class="cfg-head"><h3>' + ({ text: '文本模型', image: '图片模型', video: '视频模型' })[currentTab] + '</h3>' +
         '<span class="hint">预设仅填入默认模板，保存后生效</span></div>';
     }
-    if (currentTab === 'general') html += '<div class="hint">浏览器直连第三方接口可能被 CORS 拦截。开启代理后，请先在本目录运行 <b>node server.js</b>，再通过本地地址访问页面。</div>';
+    if (currentTab === 'general') html += '<div class="hint">全在线运行：不需要本地代理或 node 服务。每个客户在自己的浏览器里填写接口与密钥，密钥只存在本机 localStorage，不会上传、不会写进源码。</div>';
     html += '<div class="cfg-grid">';
     fields.forEach(function (f, i) {
       var v = cfg[f.k];
@@ -726,7 +725,10 @@
   }
   function refreshConfigUI() {
     var c = S.cfg;
-    $('#modelPill').textContent = '文本 ' + (c.text.model || '-') + ' · 图片 ' + (c.image.model || '-') + ' · 视频 ' + (c.video.model || '-');
+    var keyed = [c.text, c.image, c.video].filter(function (x) { return !!x.apiKey; }).length;
+    $('#modelPill').textContent = keyed
+      ? '文本 ' + (c.text.model || '-') + ' · 图片 ' + (c.image.model || '-') + ' · 视频 ' + (c.video.model || '-')
+      : '未配置密钥 · 点右上角设置填写';
     $('#imageChannel').textContent = '通道：' + channel('image');
     $('#videoChannel').textContent = '通道：' + channel('video');
     var n = [c.text, c.image, c.video].filter(function (x) { return x.apiKey || x.baseUrl !== AIHub.DEFAULT_CONFIG[x === c.text ? 'text' : x === c.image ? 'image' : 'video'].baseUrl; }).length;
@@ -991,9 +993,6 @@
   /* ---------- 国内 Agnes 配置与 30S 广告流程 ---------- */
   // 安全：密钥绝不写入源码（公开仓库会泄露）。由使用者在设置页自行填写，
   // 仅保存在其本机浏览器的 localStorage 中。
-  function isStaticHost() {
-    return /github\.io$/i.test(location.hostname) || /pages\.dev$/i.test(location.hostname);
-  }
   function applyAgnesConfig(silent) {
     var cfg = merge(AIHub.DEFAULT_CONFIG, AIHub.loadConfig());
     ['text', 'image', 'video'].forEach(function (kind) {
@@ -1002,27 +1001,33 @@
       cfg[kind].preset = 'agnes';
       cfg[kind].apiKey = existingKey;
     });
-    // 静态部署（github.io）没有本地代理，必须直连；本地运行时开启代理更稳定
-    cfg.general.proxyEnabled = !isStaticHost();
     AIHub.saveConfig(cfg);
     S.cfg = AIHub.loadConfig();
     draft = merge(AIHub.DEFAULT_CONFIG, S.cfg);
     refreshConfigUI();
     if (!$('#settingsOverlay').hidden) renderSettings();
-    if (!silent) toast(isStaticHost()
-      ? '已填入 Agnes 接口配置。请在设置中分别填写你的 API Key（仅存本机）。'
-      : '已填入国内 Agnes 配置：文本 / 图片 / 视频', 'ok');
+    if (!silent) toast('已填入 Agnes 接口模板（不含密钥）。请在三个标签页分别填你自己的 API Key，仅存本机。', 'ok');
   }
 
   function lockFlowButtons(locked) {
     ['#btnAll', '#btnRun15', '#btnAll30', '#btnRun30'].forEach(function (id) { var el = $(id); if (el) el.disabled = locked; });
+  }
+  function buildTimeline(total, phases, cuts) {
+    cuts = cuts || [0, Math.round(total / 3), Math.round(total * 2 / 3), total];
+    var len = Math.min(phases.length, cuts.length - 1);
+    var out = [];
+    for (var i = 0; i < len; i++) out.push(cuts[i] + '-' + cuts[i + 1] + 's：' + phases[i]);
+    return out.join('\n');
+  }
+  function qualityTail(total) {
+    return '\n【在线直出 · 画质要求】一次生成完整 ' + total + ' 秒成片；全程统一光向、色温与商品外观；镜头衔接自然，不闪切、不拼贴；主体不形变、不多手多指；画面内不生成文字、字幕、水印；运镜用缓推 / 微环绕 / 焦点转移，避免剧烈晃动。';
   }
   function run15(opts) {
     opts = opts || {};
     if (S.busy.all) return;
     S.busy.all = true;
     lockFlowButtons(true);
-    var segs = S.s15Mode === 'two' ? [8, 7] : [12];
+    var total = 15;
     var paces = {
       hook: '钩子先行：前 1 秒直接抛痛点或结果，随后一个卖点证明，最后给行动号召。',
       story: '反转小剧情：冲突出现 → 拿起商品完成动作 → 状态反转 → 产品定格。',
@@ -1050,35 +1055,23 @@
       progress(56, '4/5 生成 15S 视频提示词…');
       return generateVideoPrompt(opts);
     }).then(function () {
-      var base = $('#videoPrompt').value.trim() + '\n\n【15 秒专属节奏】' + paces[S.s15Pace];
-      $('#videoGenPrompt').value = base;
-      var urls = [], chain = Promise.resolve();
-      for (var i = 0; i < segs.length; i++) {
-        (function (idx) {
-          chain = chain.then(function () {
-            progress(64 + idx * 10, '5/5 生成第 ' + (idx + 1) + '/' + segs.length + ' 段（' + segs[idx] + ' 秒）…');
-            var p = base + (segs.length > 1 ? '\n【15 秒广告分段 ' + (idx + 1) + '/' + segs.length + '，本段 ' + segs[idx] + ' 秒；画面任务：' + paces[S.s15Pace] + '】' : '');
-            return generateVideo(true, {
-              prompt: p, duration: segs[idx], tag: '15S片段' + (idx + 1),
-              refMode: gridRef ? 'reference' : 'text', imageUrl: gridRef
-            });
-          }).then(function (res) { if (res && res.url) urls.push({ i: idx, url: res.url }); });
-        })(i);
-      }
-      return chain.then(function () { return urls; });
-    }).then(function (urls) {
-      if (urls.length < segs.length) { finish('仅生成 ' + urls.length + '/' + segs.length + ' 段 15S 视频，请查看视频历史', false); return; }
-      if (segs.length === 1) { finish('15 秒广告已生成（单段 12s）', true); return; }
-      progress(88, '5/5 本地拼接 15 秒成片…');
-      urls.sort(function (a, b) { return a.i - b.i; });
-      return AIHub.mergeVideos(urls.map(function (u) { return u.url; }), '15s-ad').then(function (res) {
-        addHistory('video', {
-          id: uid(), status: 'ok', time: now(), elapsed: '本地拼接', channel: 'ffmpeg 拼接',
-          model: '15S 成片（' + segs.join('s+') + 's）', ratio: S.ratio, resolution: '720P',
-          prompt: $('#videoPrompt').value.trim().slice(0, 600), url: res.url
-        });
-        finish('15 秒广告已生成并拼接完成', true);
-      }).catch(function (e) { finish('两段视频已生成，但拼接失败：' + e.message, false); });
+      var pace = paces[S.s15Pace] || paces.hook;
+      var p = product();
+      var sell = (p.sell.split(/[,，、]/)[0] || '核心卖点').trim();
+      var phases = S.s15Mode === 'two'
+        ? ['前 1 秒商品或痛点入画，' + pace, '手部真实使用特写，焦点落到' + sell + '，镜头缓推', '商品与人物同框，轻行动号召，正面定格']
+        : ['开场即开口抛钩子，' + pace, '完整使用动作与' + sell + '的可见证据，镜头缓推', '产品英雄镜头与收尾定格'];
+      var cuts = S.s15Mode === 'two' ? [0, 3, 9, 15] : [0, 3, 11, 15];
+      var finalPrompt = $('#videoPrompt').value.trim() + '\n\n【15 秒专属节奏】' + pace + '\n【时间线分镜 · 单条直出】\n' + buildTimeline(total, phases, cuts) + qualityTail(total);
+      $('#videoGenPrompt').value = finalPrompt;
+      progress(72, '5/5 在线生成 15 秒成片（一次接口调用）…');
+      return generateVideo(true, {
+        prompt: finalPrompt, duration: total, tag: '15S成片',
+        refMode: gridRef ? 'reference' : 'text', imageUrl: gridRef
+      });
+    }).then(function (res) {
+      if (!res || !res.url) { finish('15 秒视频未生成，请查看视频历史里的错误原因', false); return; }
+      finish('15 秒广告已在线直出完成', true);
     }).catch(function (e) { finish('15S 流程中断：' + e.message, false); });
   }
 
@@ -1087,8 +1080,9 @@
     if (S.busy.all) return;
     S.busy.all = true;
     lockFlowButtons(true);
-    var segs = S.s30Plan === '2x12' ? [12, 12, 6] : [10, 10, 10];
+    var total = 30;
     var phases = STORY_STRUCTURES[S.s30Story] || STORY_STRUCTURES.classic;
+    var cuts = S.s30Plan === '2x12' ? [0, 12, 24, 30] : [0, 10, 20, 30];
     var oldCount = $('#imageCount').value;
     $('#imageCount').value = '1';
     function finish(msg, ok) {
@@ -1098,48 +1092,33 @@
       progress(100, ok ? '30S 广告已完成' : '流程结束');
       toast(msg, ok ? 'ok' : 'err');
     }
-    progress(4, '1/6 生成 30 秒广告叙事提示词…');
+    progress(4, '1/5 生成 30 秒广告叙事提示词…');
     var gridRef = null;
     generateImagePrompt(opts).then(function () {
-      progress(12, '2/6 生成分镜宫格图…');
+      progress(16, '2/5 生成分镜宫格图…');
       return generateStoryboard(true);
     }).then(function (grid) {
       gridRef = grid && grid.url ? grid.url : null;
-      progress(20, '3/6 生成主视觉参考图…');
+      progress(28, '3/5 生成主视觉参考图…');
       return generateImages(true);
     }).then(function () {
-      progress(28, '4/6 生成视频提示词…');
+      progress(40, '4/5 生成视频提示词…');
       return generateVideoPrompt(opts);
     }).then(function () {
-      var basePrompt = $('#videoPrompt').value.trim() + '\n\n【30 秒叙事结构】' + phases.join(' → ');
-      $('#videoGenPrompt').value = basePrompt;
-      var urls = [], chain = Promise.resolve();
-      for (var i = 0; i < segs.length; i++) {
-        (function (idx) {
-          chain = chain.then(function () {
-            progress(34 + idx * 16, '5/6 生成第 ' + (idx + 1) + '/' + segs.length + ' 段（' + segs[idx] + ' 秒）…');
-            var segPrompt = basePrompt + '\n\n【30 秒广告分段 ' + (idx + 1) + '/' + segs.length + '，本段 ' + segs[idx] + ' 秒；画面任务：' + phases[idx] + '；镜头与产品保持一致，其余两段不要混入本段】';
-            return generateVideo(true, {
-              prompt: segPrompt, duration: segs[idx], tag: '30S片段' + (idx + 1),
-              refMode: gridRef ? 'reference' : 'text', imageUrl: gridRef,
-              onProgress: function (msg) { progress(34 + idx * 16, '5/6 第' + (idx + 1) + '段：' + String(msg).slice(0, 38)); }
-            });
-          }).then(function (res) { if (res && res.url) urls.push({ i: idx, url: res.url }); });
-        })(i);
-      }
-      return chain.then(function () { return urls; });
-    }).then(function (urls) {
-      if (urls.length < segs.length) { finish('仅生成 ' + urls.length + '/' + segs.length + ' 段视频，未执行合并，请查看视频历史', false); return; }
-      progress(88, '6/6 本地合并 30 秒成片…');
-      urls.sort(function (a, b) { return a.i - b.i; });
-      return AIHub.mergeVideos(urls.map(function (u) { return u.url; }), '30s-ad').then(function (res) {
-        addHistory('video', {
-          id: uid(), status: 'ok', time: now(), elapsed: '本地合并', channel: 'ffmpeg 拼接',
-          model: '30S 成片（' + segs.join('s+') + 's）', ratio: S.ratio, resolution: '720P',
-          prompt: $('#videoPrompt').value.trim().slice(0, 600), url: res.url
-        });
-        finish('30 秒广告已生成并合并完成', true);
-      }).catch(function (e) { finish('三段视频已生成，但合并失败：' + e.message, false); });
+      var finalPrompt = $('#videoPrompt').value.trim()
+        + '\n\n【30 秒叙事结构】' + phases.join(' → ')
+        + '\n【时间线分镜 · 单条直出】\n' + buildTimeline(total, phases, cuts)
+        + qualityTail(total);
+      $('#videoGenPrompt').value = finalPrompt;
+      progress(66, '5/5 在线生成 30 秒成片（一次接口调用）…');
+      return generateVideo(true, {
+        prompt: finalPrompt, duration: total, tag: '30S成片',
+        refMode: gridRef ? 'reference' : 'text', imageUrl: gridRef,
+        onProgress: function (msg) { progress(66, '5/5 ' + String(msg).slice(0, 42)); }
+      });
+    }).then(function (res) {
+      if (!res || !res.url) { finish('30 秒视频未生成，请查看视频历史里的错误原因', false); return; }
+      finish('30 秒广告已在线直出完成', true);
     }).catch(function (e) { finish('30S 流程中断：' + e.message, false); });
   }
 
@@ -1313,7 +1292,7 @@
   $('#videoPrompt').value = buildVideoPromptLocal();
   $('#videoGenPrompt').value = $('#videoPrompt').value;
   syncPromptCounts();
-  if (!AIHub.loadConfig().text.apiKey) applyAgnesConfig(true);
+  // 不预填任何厂商配置或密钥：每位客户在设置页自行填写自己的接口与 Key。
   refreshConfigUI();
   renderHistory();
   bind();
